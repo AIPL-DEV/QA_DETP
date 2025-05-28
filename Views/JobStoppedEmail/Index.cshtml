@@ -1,0 +1,44 @@
+﻿@model List<DETP.Controllers.JobStop>
+
+
+<div class="text-right">
+    <a class="btn btn-primary" href="@Url.Action("Create")">Add New</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(x => x[0].Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => x[0].Email)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(Model.IndexOf(item) + 1)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(x => item.Email)
+                        </td>
+                        <td>
+                            <a class="btn btn-secondary" href="@Url.Action("Edit",new { item.Id })"><i class="fa fa-edit"></i></a>
+
+                            <a class="btn btn-danger" href="@Url.Action("Delete",new { item.Id })"><i class="fa fa-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,344 @@
+﻿@model Tuple<DataTable, DataTable>
+@using System.Data;
+@using Microsoft.AspNetCore.Http;
+<section class="content">
+    <!-- request -->
+    @{ DateTime defaultDate = default(DateTime);
+
+        var userDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+    }
+    <i class="fa fa-2x fa-print float-right" style="color: #007bff;" onclick="window.print()"></i>
+
+    <i class="fa fa-2x fa-minus-circle float-right" style="color: #007bff;" onclick="collapse()"></i>
+    <i class="fa fa-2x fa-plus-circle float-right" style="color: #007bff;" onclick="expand()"></i>
+    <br>
+    <br>
+    <script>
+        function expand() {
+            $('.collapse').collapse('show');
+        }
+        function collapse() {
+            $('.collapse').collapse('hide');
+        }
+    </script>
+    <form role="form" id="myform">
+        <div id="accordion">
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#Observation-Details">
+                            Request Details
+                        </a>
+                    </h4>
+                </div>
+                <div id="Observation-Details" class="panel-collapse">
+                    <!-- form start -->
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="date">Request Date Time</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[1].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Job No</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[2].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Job Name</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[3].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Location</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[4].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Entered by</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[5].ToString()" class="form-control" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Status">Status</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[6].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <table border="2" cellpadding="10">
+                                <thead>
+                                    <tr>
+                                        <th>Photograph</th>
+                                        <th>Observation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ph">
+                                    @if (Model.Item2 != null)
+                                    { 
+                                    @if (Model.Item2.Rows.Count > 0)
+                                    {
+                                        @for (int aa = 0; aa < Model.Item2.Rows.Count; aa++)
+                                        {
+                                            <tr>
+                                                <td> <img src="@Model.Item2.Rows[aa].ItemArray[1].ToString()" /></td>
+                                                <td> @Model.Item2.Rows[aa].ItemArray[2].ToString()</td>
+                                            </tr>
+
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            @{String btnshow = "no"; }
+
+            @if (Model.Item1.Rows[0].ItemArray[6].Equals("Pending"))
+            {
+                btnshow = "yes";
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#pdstdetails">
+                                Pending
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="pdstdetails" class="panel-collapse collapse">
+                        <div class="card-body">
+
+
+
+
+
+
+                            @if (Model.Item2 != null)
+                            {
+                                <table border="2" cellpadding="10">
+                                    <thead>
+                                        <tr>
+                                            <th>Photograph</th>
+                                            <th>Observation</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ph">
+
+                                        @for (int aa = 0; aa < Model.Item2.Rows.Count; aa++)
+                                        {
+                                            <tr>
+                                                <td> <img src="@Model.Item2.Rows[aa].ItemArray[1].ToString()" width="200" height="200" /></td>
+                                                <td> @Model.Item2.Rows[aa].ItemArray[2].ToString()</td>
+                                                <td>
+                                                    <a href="@Url.Action("DeletePhoto", "EditDesignRequest", new { id = @Model.Item2.Rows[aa].ItemArray[0].ToString(), observation_id = @Model.Item2.Rows[aa].ItemArray[4].ToString() })"><i class="fa fa-minus-circle"></i></a>
+                                                </td>
+                                            </tr>
+
+
+                                        }
+
+
+                                    </tbody>
+                                </table>
+                            }
+
+
+                            <div class="form-group">
+                                <table border="2" cellpadding="10" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Photographs (Only Image Files Allowed)
+                                            </th>
+                                            <th>Observation Details</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="image_app">
+
+                                        <tr id="row0">
+                                            <td> <input type="file" class="form-control" id="fileInput" name="img[]" onchange="upimg(this,0)" accept="image/*" multiple> <textarea name="img_data[]" id="img_data" class="form-control" rows="3" placeholder="" hidden></textarea></td>
+                                            <td> <textarea name="observation" id="observation" class="form-control" rows="3" placeholder=""></textarea></td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary float-right" onclick="addimgrow()">Add</button>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <label for="Status">Action</label>
+                                <select name="ac" id="ac" class="form-control">
+                                    <option value="save">Save</option>
+                                    <option value="fwd">Save & Forward</option>
+                                </select>
+                            </div>
+                            <script>
+                                var lineNo2 = 1;
+
+                                function addimgrow() {
+                                    markup = "  <tr id='row" + lineNo2 + "'><td> <input type='file' name='img[]' onChange='upimg(this," + lineNo2 +")' class='form-control' id='fileInput' accept='image/*' multiple> <textarea name='img_data[]' id='img_data' class='form-control' rows='3' placeholder='' hidden></textarea></td> <td> <textarea name='observation' id='observation' class='form-control' rows='3' placeholder=''></textarea></td> <td></td></tr>";
+
+                                    lineNo2 = lineNo2+1;
+                                    tableBody = $("#image_app");
+                                    tableBody.append(markup);
+                                }
+
+                                function getBase64(file,ln2) {
+                                var reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                    reader.onload = function () {
+                                        $('#row'+ln2).find('textarea').first().val(reader.result);
+                                    };
+                                reader.onerror = function (error) {
+                                    console.log('Error: ', error);
+                                    };
+                            }
+                                function upimg(s,ln) {
+                                    img_array = [];
+                                    var files = s.files;
+                                    for (var i = 0; i < files.length; i++) {
+                                        if (files.length > 0) {
+                                            var ext = files[i].name.substr(-3);
+                                            if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif") {
+                                                getBase64(files[i],ln);
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        observation: {
+                                                            required: true
+                                                        },
+                                                        photos: {
+                                                            required: true
+
+                                                        },
+                                                        ac: {
+                                                            required: true
+
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            observation: $("textarea[id='observation']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            photos: $("textarea[id='img_data']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            ac: $('#ac').val(),
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        console.log(dataToSend);
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "ViewDesignObservations")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                            </script>
+                            
+
+                        </div>
+                    </div>
+                </div>
+            }
+                <!-- /.card-body -->
+                @if (btnshow == "yes")
+                {
+                    <div class="card-footer">
+                        <button id="submit_sha_request" type="button" class="btn btn-primary float-right" onclick="SubmitRequest()" data-request-url="@Url.Action("Update", "EditDesignRequest")">Submit</button>
+                    </div>
+                }
+</form>
+
+
+    <!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please Wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Request Updated Successfully!<br /><br /><center>Please be patient you are being redirected...</center>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+<script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script>
+
+
+    $('#decision').on('change', function () {
+        if (this.value == "Accepted") {
+            $('.acc').css('display', 'block');
+            $('.rej').css('display', 'none');
+        }
+        if (this.value == "Rejected") {
+            $('.rej').css('display', 'block');
+            $('.acc').css('display', 'none');
+        }
+    });
+
+</script>

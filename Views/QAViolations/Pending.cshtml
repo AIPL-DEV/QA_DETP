@@ -1,0 +1,206 @@
+﻿@using DETP.model.QaViolation
+@model List<IGrouping<string, QaViolation>>
+
+@section Head {
+	<style>
+		.status-bg div{
+			height: 20px;
+			width: 20px;
+			border-radius: 50%;
+		}
+		.status-bg {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	</style>
+}
+
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="table table-sm main-table">
+					<thead>
+						<tr>
+							<th>
+								Expand
+							</th>
+							<th>
+								Vendor Code
+							</th>
+							<th>
+								Vendor Name
+							</th>
+							<th>
+								Total Number of Consequence*
+							</th>
+							<th>
+								Open
+							</th>
+							<th>
+								Close
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var group in Model)
+						{
+							<tr>
+								<td>
+									<button class="btn btn-sm btn-primary btn-expandable" data-id="@group.Key">
+										<i class="fa fa-chevron-down d-none"></i>
+										<i class="fa fa-chevron-right"></i>
+										<i class="fa fa-spinner fa-spin d-none"></i>
+									</button>
+								</td>
+								<td>
+									@group.Key
+								</td>
+								<td>
+									@group.FirstOrDefault()?.Observation.VendorName
+								</td>
+								<td>
+									@group.Count()
+								</td>
+								<td>
+									@(group.Where(x => !new List<QaViolationStatus> { QaViolationStatus.FINISHED, QaViolationStatus.REJECTED }.Contains(x.Status)).Count())
+								</td>
+								<td>
+									@(group.Where(x => new List<QaViolationStatus> { QaViolationStatus.FINISHED, QaViolationStatus.REJECTED }.Contains(x.Status)).Count())
+								</td>
+							</tr>
+							@* <tr class="d-none expanded" style="background-color: #ddd">
+								<td colspan="7">
+									<div class="table-responsive">
+										<table class="table">
+											<tr>
+												<th>
+													Vendor Code
+												</th>
+												<th>
+													Vendor Name
+												</th>
+												<th>
+													FY
+												</th>
+												<th>
+													Visit No.
+												</th>
+												<th>
+													Observation Details
+												</th>
+												<th>
+													Status
+												</th>
+												<th>
+													Action
+												</th>
+											</tr>
+											@foreach (var item in group.ToList())
+											{
+												<tr>
+													<td>@item.Observation.VendorCode</td>
+													<td>@item.Observation.VendorName</td>
+													<td>@item.Observation.LoggedDate</td>
+													<td>@item.Observation.VisitNo</td>
+													<td>@item.ObservationDetails</td>
+													<td style="background-color: @(item.Status == QaViolationStatus.FINISHED || item.Status == QaViolationStatus.REJECTED ? "green":"red")"></td>
+													<td>
+														<a href="@Url.Action("Action", new {id = item.Id})" class="btn btn-primary">Open</a>
+													</td>
+												</tr>
+											}
+										</table>
+									</div>
+								</td>
+							</tr> *@
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		$('.btn-expandable').on('click', (event) => {
+			if($(event.currentTarget).parent().parent().next().hasClass('expanded')){
+				$(event.currentTarget).parent().parent().next().toggleClass('d-none')
+				$(event.currentTarget).children().toggleClass('d-none')
+			}
+			else{
+				const id = $(event.currentTarget).attr('data-id');
+				$(event.currentTarget).children().addClass('d-none')
+				$(event.currentTarget).children().find('.fa-spin').removeClass('d-none')
+				
+
+				getViolationByVendorCode(id).then(res => {
+					$(event.currentTarget).parent().parent().after(res)
+					$(event.currentTarget).children().first().removeClass('d-none')
+					$(event.currentTarget).find('.fa-spin').remove()
+				})
+				
+			}
+		})
+
+		async function getViolationByVendorCode(id){
+			const response = await fetch('QAViolations/ByVendorCode/'+id)
+			const data = await response.json();
+			let html =  `<tr class="expanded" style="background-color: #ddd">
+								<td colspan="7">
+									<div class="table-responsive">
+										<table class="table">
+											<tr>
+												<th>
+													Vendor Code
+												</th>
+												<th>
+													Vendor Name
+												</th>
+												<th>
+													FY
+												</th>
+												<th>
+													Visit No.
+												</th>
+												<th>
+													Observation Details
+												</th>
+												<th>
+													Status
+												</th>
+												<th>
+													Action
+												</th>
+											</tr>`;
+
+			for(let i = 0; i < data.length; i++){
+				const item = data[i]
+				html +=
+
+									`<tr>
+										<td>${item.observation.vendorCode}</td>
+										<td>${item.observation.vendorName}</td>
+										<td>${item.observation.loggedDate}</td>
+										<td>${item.observation.visitNo}</td>
+										<td>${item.observationDetails}</td>
+										<td class="status-bg"><div style="background-color: ${item.status == 4 || item.status == 5 ? 'green':'red'}"></div></td>
+										<td>
+											<a href="QaViolations/Action/${item.id}" class="btn btn-primary">${item.status == 4 || item.status == 5 ? 'View':'Open'}</a>
+										</td>
+									</tr>`
+				}
+			html += `</table>
+					</div>
+				</td>
+			</tr>`
+			console.log(html);
+			return html;
+		}
+
+		$('.main-table').DataTable();
+	</script>
+}

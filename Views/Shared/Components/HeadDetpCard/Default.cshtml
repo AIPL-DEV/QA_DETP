@@ -1,0 +1,96 @@
+﻿@model HeadDetpCardModel
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#head-detp-@Model.Index">
+                Sectional Head QA
+            </a>
+        </h4>
+    </div>
+    <div id="head-detp-@Model.Index" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-6 form-group">
+                    <label>Decision</label>
+                    <p name="decision" class="border rounded p-2">
+
+                        <span>
+                            @if (@Model.HeadDetp.Decision == "Accepted")
+                            {
+                                <span>Accepted</span>
+                            }
+                            else if (@Model.HeadDetp.Decision == "Forward to QA")
+                            {
+                                <span>Forward for Closure</span>
+                            }
+                            else
+                            {
+                                @Model.HeadDetp.Decision
+                            }
+                        </span>
+                    </p>
+                </div>
+
+                <div class="col-6 form-group">
+                    <label>Non Confirmance</label>
+                    <p class="border p-2">
+                        <span>
+                            @if (Model.HeadDetp.NonConformance == "Accepted")
+                            {
+                                <span>forward for closure</span>
+                            }
+                            else if (Model.HeadDetp.NonConformance == "Forward to QA")
+                            {
+                                if (@Model.IsCritical)
+                                {
+                                    <span>
+                                        Forward for Closure
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>Ok &amp; Closed</span>
+                                }
+                            }
+                            else
+                            {
+                                @Model.HeadDetp.NonConformance
+                            }
+                        </span>
+                    </p>
+                </div>
+
+                <div class="col-6 form-group">
+                    <label>Job</label>
+
+                    <p name="job" class="border rounded p-2">
+                        <span>@Model.HeadDetp.Job</span>
+                    </p>
+                </div>
+                @if (Model.HeadDetp.Job != "")
+                {
+                    <div class="col-6 form-group">
+                        <label>Remarks</label>
+                        <pre name="remarks" class="border rounded p-2">@Model.HeadDetp.Remarks</pre>
+                    </div>
+                }
+                <div class="col-6 form-group">
+                    <label>Decision By</label>
+                    <p name="decision_by" class="border rounded p-2">
+                        <span>@Model.HeadDetp.DecisionBy?.Name</span>
+                    </p>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Decision Date</label>
+                    <p name="decision_date" class="border rounded p-2">
+                        <span>@Model.HeadDetp.DecisionDate?.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+
+                <!-- /.form group -->
+            </div>
+        </div>
+    </div>
+</div>

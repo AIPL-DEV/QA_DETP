@@ -1,0 +1,140 @@
+﻿@{
+	QAObservation observation = ViewBag.Observation;
+}
+
+
+@section Head {
+	<link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+}
+
+<div class="container mt-4">
+	<form id="violationForm">
+		<div class="card">
+			<div class="card-header">
+				<h4>Vendor Violation</h4>
+			</div>
+			<div class="card-body">
+
+				<div class="row">
+					<input value="@observation.SerialNo" id="ObservationId" name="ObservationId" type="hidden" />
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="vendorCode" class="form-label">Vendor Code</label>
+						<input type="text" class="form-control" id="vendorCode" placeholder="Enter Vendor Code" value="@observation.VendorCode" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="vendorName" class="form-label">Vendor Name</label>
+						<input type="text" class="form-control" id="vendorName" placeholder="Enter Vendor Name" value="@observation.VendorName" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="vendorEmail" class="form-label">Vendor Email ID</label>
+						<input type="email" class="form-control" id="VendorEmail" name="VendorEmail" placeholder="Enter Vendor Email ID" required>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="violationType" class="form-label">Type of Violation</label>
+						<input type="text" class="form-control" id="violationType" placeholder="Enter Type of Violation" value="Critical" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="division" class="form-label">Division</label>
+						<input type="text" class="form-control" id="division" placeholder="Enter Division" required value="@observation.Division?.name" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="department" class="form-label">Department</label>
+						<input type="text" class="form-control" id="department" placeholder="Enter Department" required value="@observation.Dept?.Name" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="location" class="form-label">Location</label>
+						<input type="text" class="form-control" id="location" placeholder="Enter Location" required value="@observation.Location" disabled>
+					</div>
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="location" class="form-label">Site</label>
+						<input type="text" class="form-control" id="site" placeholder="Enter Site" required value="@observation.Site" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="observationDate" class="form-label">Date of Observation</label>
+						<input type="date" class="form-control" id="observationDate" value="@observation.LoggedDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" disabled>
+					</div>
+
+
+					<div class="col-12 col-md-6 col-lg-4 mb-3">
+						<label for="violationCount" class="form-label">Violation Count</label>
+						<input type="number" class="form-control" id="violationCount" placeholder="Enter Violation Count" disabled value="@ViewBag.ViolationCount">
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-6 mb-3">
+						<label for="observationDetails" class="form-label">Observation Details</label>
+						<textarea class="form-control" id="ObservationDetails" name="ObservationDetails" rows="3" placeholder="Enter Observation Details" required>@Html.Raw(Html.Encode(observation.LogNonConfirmance))</textarea>
+
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-6 mb-3">
+						<label for="Attachment" class="form-label">Attachment</label>
+						<input type="file" class="form-control" id="Attachment" name="Attachment">
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-3 mb-3">
+						<label for="createdBy" class="form-label">Created by</label>
+						<input type="text" class="form-control" id="createdBy" placeholder="Enter Created By" required value="@ViewBag.UserName" disabled>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-3 mb-3">
+						<label for="createdOn" class="form-label">Created On</label>
+						<input type="date" class="form-control" id="createdOn" required value="@(DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))" disabled>
+					</div>
+				</div>
+			</div>
+
+			<div class="card-header">
+				<h4>Pelanty Information</h4>
+			</div>
+			<div class="card-body">
+				<div class="row mb-3">
+					<div class="col-md-6">
+						<label for="violationCategory" class="form-label">Category of Violation</label>
+						<select asp-items="ViewBag.Categories" class="form-control" id="ViolationCategory" name="ViolationCategory">
+							<option value="">Choose...</option>
+						</select>
+						@* <input type="text" class="form-control" id="violationCategory" name="violationCategory"> *@
+					</div>
+					<div class="col-md-6">
+						<label for="SubCategory" class="form-label">Sub Category</label>
+
+						<select class="form-control" id="SubCategory" name="SubCategory"></select>
+					</div>
+				</div>
+
+				<div class="row mb-3">
+					<div class="col-md-4">
+						<label for="financialPenalty" class="form-label">Financial Penalty</label>
+						<span class="border rounded w-full d-block p-2" style="min-height: 40px;" id="financialPenalty"></span>
+					</div>
+					<div class="col-md-4">
+						<label for="administrative" class="form-label">Administrative</label>
+						<span class="border rounded w-full d-block p-2" style="min-height: 40px;" id="administrative" disabled></span>
+					</div>
+					<div class="col-md-4">
+						<label for="Amount" class="form-label">Amount</label>
+						<input type="number" class="form-control" id="Amount" name="Amount">
+						
+					</div>
+				</div>
+
+				<button type="submit" class="btn btn-primary">Submit</button>
+
+
+			</div>
+		</div>
+	</form>
+</div>
+
+
+@section Scripts {
+	<script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+	<script src="~/dist/js/qaviolation/create.js"></script>
+}

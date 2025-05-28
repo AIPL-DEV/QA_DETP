@@ -1,0 +1,41 @@
+﻿@model System.Data.DataTable
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Data;
+
+<div class="container-fluid p-3">
+    <div class="card p-3">
+        <div class="card-body">
+            <table class="table" id="example1">
+                <thead>
+                    <tr>
+                        <td>Sr.No.</td>
+                        <td>Visit No.</td>
+                        <td>Status</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow item in Model.Rows)
+                    {
+
+
+                        <tr>
+                            <td>
+                                @item.ItemArray[0]
+                            </td>
+                            <td>
+                                @item.ItemArray[1]
+                            </td>
+                            <td>
+                                @item.ItemArray[2]
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Edit","QAFlow",new {id=item.ItemArray[0] })"><i class="fa fa-edit"></i> Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

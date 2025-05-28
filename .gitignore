@@ -1,0 +1,7 @@
+﻿/.vs
+/bin
+/obj
+/.vscode
+node_modules
+publish
+/wwwroot/uploads

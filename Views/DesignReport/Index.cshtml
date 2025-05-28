@@ -1,0 +1,58 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Data;
+@model Tuple<DataTable>
+
+<section class="content">
+    <!-- job -->
+
+    <div class="container-fluid">
+        <div class="">
+
+                    <div class="card card-primary card-outline card-outline-tabs">
+                        <table id="example3" class="table table-hover text-nowrap">
+                            <thead>
+                                @if (Model.Item1 != null && Model.Item1.Columns[0].ColumnName.Equals("id"))
+                                {
+                                    <tr>
+
+                                        @for (int i = 0; i < Model.Item1.Columns.Count; i++)
+                                        {
+                                            <th>
+                                                @Model.Item1.Columns[i].ColumnName.Replace("_", " ").ToString()
+                                            </th>
+                                        }
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                }
+                            </thead>
+                            <tbody>
+                                @if (Model.Item1 != null && Model.Item1.Columns[0].ColumnName.Equals("id"))
+                                {
+                                    @for (int i = 0; i < Model.Item1.Rows.Count; i++)
+                                    {
+                                        <tr onclick="window.location.href = '@Url.Action("index", "EditDesignRequest", new { serial_no = @Model.Item1.Rows[i].ItemArray[0].ToString() })';">
+                                            @for (int j = 0; j < Model.Item1.Columns.Count; j++)
+                                            {
+                                                <td>
+                                                    @Model.Item1.Rows[i].ItemArray[j].ToString()
+                                                </td>
+                                            }
+                                            <td>
+
+                                                <button id="submit_request" type="button" class="btn btn-primary float-right" onclick="window.location.href = '@Url.Action("index", "EditDesignRequest", new { serial_no = @Model.Item1.Rows[i].ItemArray[0].ToString() })';">View</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                </div>
+            </div>
+            <!-- /.card -->
+
+</section>

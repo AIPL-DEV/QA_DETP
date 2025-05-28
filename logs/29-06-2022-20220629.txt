@@ -1,0 +1,5 @@
+2022-06-29T13:04:24.3858473+05:30  [INF] Application started. Press Ctrl+C to shut down. (dcaefe54)
+2022-06-29T13:04:24.3918188+05:30  [INF] Hosting environment: "Development" (c3307c92)
+2022-06-29T13:04:24.3918970+05:30  [INF] Content root path: "D:\sagar\projects\donnetproject\DETP" (b5d60022)
+2022-06-29T13:04:24.4397945+05:30 8000000b-0000-e500-b63f-84710c7967bb [WRN] Failed to determine the https port for redirect. (ca76cc21)
+2022-06-29T13:04:34.2290861+05:30 80000090-0001-fa00-b63f-84710c7967bb [INF] accessing index (49dd0e83)

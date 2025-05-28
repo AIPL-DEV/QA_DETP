@@ -1,0 +1,995 @@
+﻿@using DETP.Constant
+@using Microsoft.AspNetCore.Http;
+@using System.Data;
+@using DETP;
+@using DETP.model;
+@using System.Globalization
+
+<style>
+    .card-img-top {
+        object-fit: contain !important;
+    }
+</style>
+
+<script>var imageIndex = 0; var imgs = [];</script>
+@{
+    bool IsHoDDETP(DateTime? date)
+    {
+        if (date == null)
+        {
+            return false;
+        }
+        if (date < new DateTime(2022, 12, 03))
+            return false;
+        else
+        {
+            return true;
+        }
+    }
+    var role_name = Context.Session.GetString("role_name");
+    string convertDate(string strDate)
+    {
+        DateTime date;
+        DateTime.TryParse(strDate, out date);
+        var parsedDate = date.ToString("dd-MM-yyyy");
+        if ("01-01-1970" == parsedDate)
+            return "";
+        if ("01-01-0001" == parsedDate)
+        {
+            return "";
+        }
+        if ("01-01-1900" == parsedDate)
+        {
+            return "";
+        }
+        return parsedDate;
+    }
+    bool isCritical = false;
+}
+
+@{
+    String btnshow = "no";
+}
+
+@{
+    List<BaseModel> values = Model;
+}
+
+@{
+    QAObservation observation = ViewBag.observation;
+}
+
+@if (observation.NatureOfConfirmance == "Critical")
+{
+    isCritical = true;
+}
+<section class="content">
+
+    <i class="fa fa-2x fa-print float-right" style="color: #007bff;" onclick="window.print()"></i>
+    <i class="fa fa-2x fa-minus-circle float-right" style="color: #007bff;" onclick="collapse()"></i>
+    <i class="fa fa-2x fa-plus-circle float-right" style="color: #007bff;" onclick="expand()"></i>
+    @if (Context.Session.GetString("role_name") == "Super Admin")
+    {
+        <a href="@Url.Action("Edit","QAFlow",new{Id=observation.SerialNo})" class="fa fa-2x fa-edit mr-2 float-right" style="color: #007bff;"></a>
+    }
+    <br>
+    <br>
+    <script>
+        function expand() {
+            $('.collapse').collapse('show');
+        }
+        function collapse() {
+            $('.collapse').collapse('hide');
+        }
+    </script>
+    <!-- job -->
+
+    <div class="container-fluid">
+        <div class="card">
+            <form role="form" id="myform">
+                <div class="card-body">
+                    <div id="accordion">
+
+                        <vc:observation-card index="0" role-name="role_name" observation="observation" />
+                        @for (int i = 0; i < values.Count; i++)
+                        {
+                            var item = values[i];
+
+                            if (item.GetType() == typeof(HeadDetp))
+                            {
+                                HeadDetp head_detp = (HeadDetp)item;
+                                <vc:head-detp-card index="i" role-name="role_name" head-detp="(HeadDetp)item" is-critical="isCritical" />
+                            }
+
+                            if (item.GetType() == typeof(EicDetp))
+                            {
+                                <vc:eic-detp-card index="i" role-name="role_name" eic-detp="(EicDetp)item" />
+
+                            }
+
+                            else if (item.GetType() == typeof(BusinessHead))
+                            {
+                                <vc:business-head-card index="i" role-name="role_name" business-head="(BusinessHead)item" />
+                            }
+
+
+                            else if (item.GetType() == typeof(Assignee))
+                            {
+                                <vc:assignee-card index="i" role-name="role_name" assignee="(Assignee)item" />
+                            }
+
+                            else if (item.GetType() == typeof(SiteIncharge))
+                            {
+                                <vc:site-incharge-card index="i" role-name="role_name" site-incharge="(SiteIncharge)item" />
+                            }
+
+                            else if (item.GetType() == typeof(ProjectIncharge))
+                            {
+                                <vc:project-incharge-card index="i" project-incharge="(ProjectIncharge)item" role-name="role_name" />
+                            }
+
+                            else if (item.GetType() == typeof(DeptHod))
+                            {
+                                <vc:dept-hod-card index="i" role-name="role_name" is-critical="isCritical" dept-hod="(DeptHod)item" />
+                            }
+
+                            else if (item.GetType() == typeof(QAOfficer))
+                            {
+                                <vc:qa-officer-card index="i" role-name="role_name" q-a-officer="(QAOfficer)item" />
+                            }
+                            else if (item.GetType() == typeof(HodQaSha))
+                            {
+                                <vc:hod-qa-sha-card index="i" role-name="role_name" hod-qa-sha="(HodQaSha)item" is-critical="isCritical" />
+                            }
+                        }
+
+
+
+
+                        @{
+                            CurrentFlow current_dt = ViewBag.CurrentFlow;
+                            if (current_dt.Department != null)
+                            {
+                                string current = current_dt.Department;
+
+                                <div class="card card-primary">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#@current.Replace(' ', '-')">
+                                                @if (current.Equals("H-QA Officer"))
+                                                {
+                                                    <span>QA Officer</span>
+                                                }
+                                                else if (current.Equals("Head DETP"))
+                                                {
+                                                    <span>Sectional Head QA</span>
+                                                }
+                                                else if (current == "EIC DETP")
+                                                {
+                                                    <span>HoD DETP</span>
+                                                }
+                                                else
+                                                {
+                                                    @current
+                                                }
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="@current.Replace(' ', '-')" class="panel-collapse collapse show">
+
+                                        <div class="card-body">
+                                            @{
+
+                                                BaseModel itemlast = values.Count > 0 ? values.Last() : null;
+                                                ViewData["observation"] = observation;
+                                                ViewData["current_dt"] = current_dt;
+                                                ViewData["itemlast"] = itemlast;
+
+                                                if (current.Equals("Head DETP"))
+                                                {
+                                                    btnshow = "yes";
+
+                                                    <partial name="_HeadDetpForm.cshtml" model="new HeadDetpCreateRequest()" view-data="ViewData" />
+                                                }
+
+
+                                                else if (current.Equals("Business Head"))
+                                                {
+                                                    btnshow = "yes";
+                                                    ViewData["observation"] = observation;
+                                                    <partial name="_BusinessHeadForm.cshtml" model="new BusinessHeadCreateRequest()" view-data="ViewData" />
+                                                }
+
+                                                else if (current.Equals("H-QA Officer"))
+                                                {
+                                                    btnshow = "yes";
+                                                    
+                                                    <div class="col-12 form-group">
+                                                        <label>Satisfactory Compliance</label>
+                                                        <select name="compliance_satisfactory" id="compliance_satisfactory" class="form-control">
+                                                            <option value="yes">Yes</option>
+                                                            <option value="no">No</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label>Within SLG?</label>
+                                                        <select name="within_slg" id="within_slg" class="form-control">
+                                                            <option value="yes">Yes</option>
+                                                            <option value="no">No</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label for="remarks">Remarks</label>
+                                                        <textarea type="text" class="form-control" name="remarks" id="remarks" placeholder="Remarks" required></textarea>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label for="remarks">Attachments</label>
+                                                        <input type="file" onchange="showImage(this)" class="form-control" name="fileInput" id="fileInput" multiple>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="row" id="images">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label>Decision By</label>
+                                                        <select name="decision_by" id="decision_by" class="form-control">
+                                                            <option value="@current_dt.UserId">@current_dt.Name</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        @{
+                                                            DateTime defaultDate = default(DateTime);
+
+                                                            var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+                                                        }
+                                                        <label>Decision Date</label>
+
+                                                        <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+                                                    </div>
+                                                    <script>
+                                                        var img_array = [];
+                                                        function getBase64(file) {
+                                                            img_array = [];
+                                                            var reader = new FileReader();
+                                                            reader.readAsDataURL(file);
+                                                            reader.onload = function () {
+
+                                                                img_array.push(reader.result);
+
+                                                            };
+                                                            reader.onerror = function (error) {
+                                                                console.log('Error: ', error);
+                                                            };
+                                                        }
+
+                                                        $(function () {
+                                                            img_array = [];
+                                                            var files = document.getElementById('fileInput').files;
+                                                            for (var i = 0; i < files.length; i++) {
+                                                                if (files.length > 0) {
+
+                                                                    var ext = files[i].name.substr(-3);
+                                                                    if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                                                                        getBase64(files[i]);
+                                                                    }
+
+
+                                                                }
+                                                            }
+                                                            console.log(img_array);
+
+                                                        });
+
+                                                        $('#myform').validate({
+                                                            rules: {
+                                                                compliance_satisfactory: {
+                                                                    required: true
+                                                                },
+                                                                remarks: {
+                                                                    required: true
+                                                                },
+                                                                decision_date: {
+                                                                    required: true
+                                                                }
+                                                            },
+                                                            messages: {
+                                                                decision_date: {
+                                                                    required: "This field is required"
+                                                                }
+                                                            },
+                                                            errorElement: 'span',
+                                                            errorPlacement: function (error, element) {
+                                                                error.addClass('invalid-feedback');
+                                                                element.closest('.form-group').append(error);
+                                                            },
+                                                            highlight: function (element, errorClass, validClass) {
+                                                                $(element).addClass('is-invalid');
+                                                            },
+                                                            unhighlight: function (element, errorClass, validClass) {
+                                                                $(element).removeClass('is-invalid');
+                                                            }
+                                                        });
+                                                        function Submit() {
+                                                            if ($('#myform').valid()) {
+                                                                $('#modal-loader').modal('show')
+                                                                $('#submit_request').prop('disabled', true)
+
+                                                                var values = {
+                                                                    compliance_satisfactory: $('#compliance_satisfactory').val(),
+                                                                    remarks: $('#remarks').val(),
+                                                                    decision_by: $('#decision_by').val(),
+                                                                    decision_date: $('#decision_date').val()
+                                                                }
+                                                                var url = $('#submit_request').data('request-url');
+
+                                                                imgs = [];
+                                                                $('.image-upload').each(function () {
+                                                                    imgs.push($(this).data('src'));
+                                                                });
+
+                                                                let myData = new FormData();
+                                                                myData.append("att", imgs)
+                                                                myData.append("within_slg", $('#within_slg').val())
+                                                                myData.append("data", JSON.stringify(values))
+                                                                myData.append("user_id", '@current_dt.UserId')
+                                                                myData.append("to", '@current_dt.SubmitTo')
+                                                                myData.append("from", '@current_dt.FromId')
+                                                                myData.append("observation_id", '@current_dt.ObservationId')
+                                                                myData.append("flow_id", '@current_dt.FlowId')
+                                                                request(url, myData);
+
+                                                            }
+                                                        }
+                                                    </script>
+                                                }
+
+                                                else if (current.Equals("Assignee Section"))
+                                                {
+                                                    btnshow = "yes";
+                                                    <partial name="_AssigneeForm.cshtml" model="new AssigneeCreateRequest()" view-data="ViewData" />
+                                                    
+                                                }
+
+                                                else if (current.Equals("Site Incharge"))
+                                                {
+                                                    btnshow = "yes";
+
+                                                    <partial name="_SiteInchargeForm.cshtml" model="new SiteInchargeCreateRequest()" view-data="ViewData" />
+                                                }
+
+                                                else if (current.Equals("Project Incharge"))
+                                                {
+                                                    btnshow = "yes";
+                                                    <partial name="_ProjectInchargeForm.cshtml" model="new ProjectInchargeCreateRequest()" view-data="ViewData" />
+                                                }
+
+                                                
+                                                else if (current.Equals("Dept HOD")) /*&& !bool.Parse(current_dt.Rows[0].ItemArray[8].ToString()))*/
+                                                {
+                                                    btnshow = "yes";
+                                                    <partial name="_DeptHodForm.cshtml" model="new DeptHodCreateRequest()" view-data="ViewData" />
+                                                }
+
+                                                if (current.Equals("EIC DETP"))
+                                                {
+                                                    <script>
+                                                        $('[id^="head-detp"]').collapse('show');
+                                                    </script>
+                                                }
+
+                                                if (current.Equals("EIC DETP") && current_dt.JobStopped)
+                                                {
+
+                                                    btnshow = "yes";
+                                                    <div class="col-12 form-group">
+                                                        <label>Non Conformance Closed Satisfactory and Within SLG?</label>
+                                                        <select name="decision" id="decision" class="form-control">
+                                                            @*<option value="Not Satisfied">Send To Head DETP</option>*@
+                                                            <option value="Not Satisfied">Send To Department Head</option>
+                                                            <option value="Close">Close</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label for="remarks">HoD DETP Input</label>
+                                                        <textarea type="text" class="form-control" name="remarks" id="remarks" placeholder="Remarks"></textarea>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label>Decision By</label>
+                                                        <select name="decision_by" id="decision_by" class="form-control">
+                                                            <option value="@current_dt.UserId">@current_dt.Name</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        @{
+                                                            DateTime defaultDate = default(DateTime);
+
+                                                            var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+                                                        }
+                                                        <label>Decision Date</label>
+
+                                                        <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+                                                    </div>
+                                                    <script>
+                                                        var img_array = [];
+                                                        function getBase64(file) {
+                                                            var reader = new FileReader();
+                                                            reader.readAsDataURL(file);
+                                                            reader.onload = function () {
+
+                                                                img_array.push(reader.result);
+
+                                                            };
+                                                            reader.onerror = function (error) {
+                                                                console.log('Error: ', error);
+                                                            };
+                                                        }
+
+                                                        $(function () {
+                                                            img_array = [];
+                                                            var files = document.getElementById('fileInput').files;
+                                                            for (var i = 0; i < files.length; i++) {
+                                                                if (files.length > 0) {
+
+                                                                    var ext = files[i].name.substr(-3);
+                                                                    if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                                                                        getBase64(files[i]);
+                                                                    }
+
+
+                                                                }
+                                                            }
+                                                            console.log(img_array);
+
+                                                        });
+
+
+
+                                                        $('#myform').validate({
+                                                            rules: {
+                                                                valuerec: {
+                                                                    required: true
+                                                                }
+                                                            },
+                                                            messages: {
+                                                                decision_date: {
+                                                                    required: "This field is required"
+                                                                }
+                                                            },
+                                                            errorElement: 'span',
+                                                            errorPlacement: function (error, element) {
+                                                                error.addClass('invalid-feedback');
+                                                                element.closest('.form-group').append(error);
+                                                            },
+                                                            highlight: function (element, errorClass, validClass) {
+                                                                $(element).addClass('is-invalid');
+                                                            },
+                                                            unhighlight: function (element, errorClass, validClass) {
+                                                                $(element).removeClass('is-invalid');
+                                                            }
+                                                        });
+                                                        function Submit() {
+                                                            if ($('#myform').valid()) {
+                                                                $('#modal-loader').modal('show')
+                                                                $('#submit_request').prop('disabled', true)
+
+                                                                var values = {
+                                                                    decision: $('#decision').val(),
+                                                                    remarks: $('#remarks').val(),
+                                                                    decision_by: $('#decision_by').val(),
+                                                                    decision_date: $('#decision_date').val()
+                                                                }
+                                                                var url = $('#submit_request').data('request-url');
+                                                                imgs = [];
+                                                                $('.image-upload').each(function () {
+                                                                    imgs.push($(this).data('src'));
+                                                                });
+                                                                let myData = new FormData();
+                                                                myData.append("att", imgs)
+                                                                myData.append("data", JSON.stringify(values))
+                                                                myData.append("user_id", '@current_dt.UserId')
+                                                                myData.append("to", '@current_dt.SubmitTo')
+                                                                myData.append("from", '@current_dt.FromId')
+                                                                myData.append("observation_id", '@current_dt.ObservationId')
+                                                                myData.append("flow_id", '@current_dt.FlowId')
+                                                                request(url, myData);
+                                                            }
+                                                        }
+                                                    </script>
+                                                }
+
+                                                else if (current.Equals("EIC DETP"))
+                                                {
+
+                                                    btnshow = "yes";
+                                                    <div class="col-12 form-group">
+                                                        <label>Non Conformance Closed Satisfactory and Within SLG?</label>
+                                                        <div class="col-12">
+
+                                                            <label class="form-check-label" for="decision">
+                                                                <input class="form-check-input" value="Not Satisfied" type="radio" name="decision" id="flexRadioDefault1" />
+
+                                                                Need Clarification
+                                                            </label>
+                                                            <label class="form-check-label ml-4" for="flexRadioDefault2">
+                                                                <input class="form-check-input " value="Close" type="radio" name="decision" id="flexRadioDefault2" />
+                                                                Accept
+                                                            </label>
+                                                            <label class="form-check-label ml-4" for="flexRadioDefault2">
+                                                                <input class="form-check-input " value="Return QA" type="radio" name="decision" id="flexRadioDefault2" />
+                                                                Return QA
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label for="remarks"> HoD DETP Input</label>
+                                                        <textarea type="text" class="form-control" name="remarks" id="remarks" placeholder="Remarks"> </textarea>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        <label>Decision By</label>
+                                                        <select name="decision_by" id="decision_by" class="form-control">
+                                                            <option value="@current_dt.UserId">@current_dt.Name</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 form-group">
+                                                        @{
+                                                            DateTime defaultDate = default(DateTime);
+
+                                                            var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+                                                        }
+                                                        <label>Decision Date</label>
+
+                                                        <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+                                                    </div>
+                                                    <script>
+                                                        var img_array = [];
+                                                        function getBase64(file) {
+                                                            var reader = new FileReader();
+                                                            reader.readAsDataURL(file);
+                                                            reader.onload = function () {
+
+                                                                img_array.push(reader.result);
+
+                                                            };
+                                                            reader.onerror = function (error) {
+                                                                console.log('Error: ', error);
+                                                            };
+                                                        }
+
+                                                        $(function () {
+                                                            img_array = [];
+                                                            var files = document.getElementById('fileInput').files;
+                                                            for (var i = 0; i < files.length; i++) {
+                                                                if (files.length > 0) {
+
+                                                                    var ext = files[i].name.substr(-3);
+                                                                    if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                                                                        getBase64(files[i]);
+                                                                    }
+
+
+                                                                }
+                                                            }
+                                                            console.log(img_array);
+
+                                                        });
+
+                                                        $('#myform').validate({
+                                                            rules: {
+                                                                valuerec: {
+                                                                    required: true
+                                                                },
+                                                            },
+                                                            messages: {
+                                                                decision_date: {
+                                                                    required: "This field is required"
+                                                                }
+                                                            },
+                                                            errorElement: 'span',
+                                                            errorPlacement: function (error, element) {
+                                                                error.addClass('invalid-feedback');
+                                                                element.closest('.form-group').append(error);
+                                                            },
+                                                            highlight: function (element, errorClass, validClass) {
+                                                                $(element).addClass('is-invalid');
+                                                            },
+                                                            unhighlight: function (element, errorClass, validClass) {
+                                                                $(element).removeClass('is-invalid');
+                                                            }
+                                                        });
+                                                        function Submit() {
+                                                            if ($('#myform').valid()) {
+
+
+                                                                var values = {
+
+                                                                    decision: $("input[name='decision']:checked").val(),
+                                                                    remarks: $('#remarks').val(),
+                                                                    decision_by: $('#decision_by').val(),
+                                                                    decision_date: $('#decision_date').val()
+                                                                }
+
+                                                                if ($("input[name='decision']:checked").length == 0) {
+                                                                    $("input[name='decision']").parent().parent().addClass('is-invalid');
+                                                                    return;
+                                                                }
+                                                                else {
+                                                                    $('#modal-loader').modal('show')
+                                                                    $('#submit_request').prop('disabled', true)
+                                                                    var url = $('#submit_request').data('request-url');
+                                                                    imgs = [];
+                                                                    $('.image-upload').each(function () {
+                                                                        imgs.push($(this).data('src'));
+                                                                    });
+                                                                    let myData = new FormData();
+                                                                    myData.append("att", imgs);
+                                                                    myData.append("data", JSON.stringify(values))
+                                                                    myData.append("user_id", '@current_dt.UserId')
+                                                                    myData.append("to", '@current_dt.SubmitTo')
+                                                                    myData.append("from", '@current_dt.FromId')
+                                                                    myData.append("observation_id", '@current_dt.ObservationId')
+                                                                    myData.append("flow_id", '@current_dt.FlowId')
+
+                                                                    request(url, myData);
+                                                                }
+                                                            }
+                                                        }
+                                                    </script>
+                                                }
+
+                                                if (current.Equals("EIC DETP"))
+                                                {
+                                                    <script>
+                                                        $('[id^="head-detp"]').collapse('show');
+                                                    </script>
+                                                }
+
+                                                if (current.Equals("HoD QA & SHA"))
+                                                {
+
+                                                    btnshow = "yes";
+                                                    <partial name="_HodQaShaForm.cshtml" model="new HodQaShaCreateRequest()" view-data="ViewData" />
+                                                }
+
+
+                                                if (current.Equals("QA Officer"))
+                                                {
+                                                    btnshow = "yes";
+                                                    <partial name="_QaOfficerForm.cshtml" model="new QAOfficerCreateRequest()" view-data="ViewData" />
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                </div>
+                @if (btnshow.Equals("yes"))
+                {
+                    <div class="card-footer">
+                        <button id="submit_request" type="submit" class="btn btn-primary float-right">Submit</button>
+                    </div>
+                }
+            </form>
+        </div>
+    </div><!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Report Submitted Successfully!<br>Kindly Be Patient You are Being Redirected...</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="modal-success-status">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Submited Successfully<br />Current Status is: </p>
+                    <b><p class="text-center" id="status"></p></b><br>
+                    <p class="text-center"> Kindly Be Patient You are Being Redirected...</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- Add image modal -->
+    @if (role_name == "Super Admin")
+    {
+        <div class="modal fade" id="add_image_modal" tabindex="-1" role="dialog" aria-labelledby="add_image_modal_area" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="add_image_modal_title">Change To</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form enctype="multipart/form-data" action="@Url.Action("AddImage")" method="post">
+                        <div class="modal-body">
+                            <input type="hidden" id="type" name="type" />
+                            <input type="hidden" id="type_id" name="type_id" />
+                            <div class="form-group">
+                                <label for="user">Add Image</label>
+                                <input type="file" id="file" name="imgs" multiple onchange="showModalImage(this)" />
+                                <div id="images" class="row">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="addModalImage()">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+@section Scripts {
+    <script src="~/dist/js/qaobservation.js"></script>
+    <script src="~/dist/js/editobservation.js"></script>
+    <script>
+        function openNewWindow(data) {
+            var w = window.open('');
+            w.document.write(
+                `<iframe width='100%' height='100%' src='${data}'></iframe>`
+            )
+        }
+    </script>
+    <script>
+
+        function showImage(input) {
+            if (input.files && input.files[0]) {
+
+                var files = input.files;
+                for (var i = 0; i < files.length; i++) {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(files[i]);
+                    reader.onload = function (e) {
+                        if (e.target.result.startsWith("data:image")) {
+                            $('#images').append(`
+                                <div class="card" style="width: 10rem;">
+
+                                    <a href="#" class="text-danger" onclick="removeImg(this,${imageIndex});return false;" style="position: absolute; right: 0;">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                    <img data-src='${e.target.result}' class="card-img-top image-upload" src='${e.target.result}' />
+
+                                </div>
+                            `);
+                        }
+                        else {
+                            $('#images').append(`
+                                <div class="card mr-3" style="max-height: 8rem;">
+
+                                    <a href="#" class="text-danger" onclick="removeImg(this,${imageIndex});return false;" style="position: absolute; right: 5px;">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+
+                                        <i class="fa fa-file-pdf fa-5x"></i>
+                                    <div class="text-center mt-1">
+                                        <a href="#" data-src="${e.target.result}" onclick="openInNew('${e.target.result}'); return false;" target="_blank" class="btn btn-sm btn-primary image-upload">View</a>
+                                    </div>
+
+                                </div>
+                            `);
+                        }
+                        imageIndex++;
+                        imgs.push(e.target.result);
+                        console.log(imgs);
+
+                    };
+
+                }
+            }
+        }
+        function openInNew(value) {
+            var w = window.open('');
+            w.document.write(
+                `<iframe width='100%' height='100%' src='${value}'></iframe>`
+            )
+        }
+        function removeImg(el, index) {
+            var src = $(el).attr('src');
+            $(el).parent().remove();
+            index = imgs.indexOf(src);
+            imgs.splice(index, 1);
+            imageIndex--;
+        }
+
+        async function request(url, data) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    contentType: false,
+                    processData: false,
+                    error: function (result) {
+                        $('#modal-loader').modal('hide');
+                        $('#submit_request').prop('disabled', false);
+                        console.log("ajax error:", result);
+                        reject(result);
+                    },
+                    success: function (result) {
+                        $('#modal-loader').modal('hide');
+                        $('#submit_request').prop('disabled', false);
+                        
+
+                        $('#myform').trigger('reset');
+                        $('#status').text(result.status);
+                        $('#modal-success-status').modal('show');
+
+                        setTimeout(function () {
+                            window.location.href = "/ViewObservation/index";
+                        }, 3000);
+
+                        resolve(result);
+                    }
+                });
+            });
+        }
+
+    </script>
+    @if (role_name == "Super Admin")
+    {
+        <script>
+            var modalImgs = [];
+            modalimageIndex = 0;
+            $('document').ready(function () {
+                $('img').on('click', function () {
+                    $('#modal_image_id').attr('src', $(this).attr("src"));
+                    $('#image_val').val($(this).attr("src"));
+                    $('#image_type').val($(this).data('type'))
+                    $('#image_type_id').val($(this).data('typeid'))
+                    $('#image_modal').modal('show');
+                });
+            });
+
+            function removeModalImg(el, index) {
+                var src = $(el).attr('src');
+                $(el).parent().remove();
+                index = imgs.indexOf(src);
+                modalImgs.splice(index, 1);
+                modalimageIndex--;
+
+            }
+
+            function getBase64(file) {
+                img_array = [];
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    img_array.push(reader.result);
+                    SubmitData();
+                };
+                reader.onerror = function (error) {
+                    console.log('Error: ', error);
+                };
+            }
+
+
+
+            function showModalImage(input) {
+                if (input.files && input.files[0]) {
+
+                    var files = input.files;
+                    for (var i = 0; i < files.length; i++) {
+                        var reader = new FileReader();
+                        reader.readAsDataURL(files[i]);
+                        reader.onload = function (e) {
+                            if (e.target.result.startsWith("data:image")) {
+                                $('#images').append(`
+                                                                        <div class="card" style="width: 10rem;">
+
+                                                                            <a href="#" class="text-danger " onclick="removeModalImg(this,${modalimageIndex});return false;" style="position: absolute; right: 0;">
+                                                                                <i class="fa fa-times"></i>
+                                                                            </a>
+                                                                                    <img class="card-img-top modal-image-upload" data-src='${e.target.result}' src='${e.target.result}' />
+
+                                                                        </div>
+                                                                    `);
+                            }
+                            else {
+                                $('#images').append(`
+                                                                        <div class="card mr-3" style="max-height: 8rem;">
+
+                                                                            <a href="#" class="text-danger modal-image-upload" data-src='${e.target.result}' onclick="removeModalImg(this,${modalimageIndex});return false;" style="position: absolute; right: 5px;">
+                                                                                <i class="fa fa-times"></i>
+                                                                            </a>
+
+                                                                                <i class="fa fa-file-pdf fa-5x"></i>
+                                                                            <div class="text-center mt-1">
+                                                                                <a href="#" onclick="openInNew('${e.target.result}'); return false;" target="_blank" class="btn btn-sm btn-primary">View</a>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    `);
+                            }
+                            imageIndex++;
+                            modalImgs.push(e.target.result);
+
+                        };
+
+                    }
+                }
+            }
+
+            function addModalImage() {
+                img_array = [];
+                var files = document.getElementById('file').files;
+                for (var i = 0; i < files.length; i++) {
+                    if (files.length > 0) {
+
+                        var ext = files[i].name.substr(-3);
+                        if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                            getBase64(files[i]);
+                        }
+                    }
+                }
+
+                console.log(img_array);
+
+                let myData = new FormData();
+                modalImgs = [];
+                $('.modal-image-upload').each(function () {
+                    modalImgs.push($(this).data('src'));
+                });
+                myData.append("type", $('#type').val())
+                myData.append("type_id", $('#type_id').val())
+                myData.append("imgs", JSON.stringify(modalImgs))
+
+                console.log(myData.get("imgs"));
+                console.log(img_array);
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("AddImage", "QAFlow")',
+                    data: myData,
+                    contentType: false,
+                    processData: false,
+                    error: function (result) {
+                        alert(result.message);
+                    },
+                    success: function (result) {
+                        if (result.status == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            alert(result.message);
+                        }
+                    }
+                });
+            }
+
+        </script>
+    }
+}

@@ -1,0 +1,232 @@
+@using DETP.Constant
+@using Microsoft.AspNetCore.Http;
+@using DETP;
+@inject Microsoft.Extensions.Configuration.IConfiguration _configuration;
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+	<!-- Brand Logo -->
+	<a href="@Url.Action("Index","Home")" class="brand-link">
+		<!--<img src="~/dist/img/main_logo.png" alt="" class="brand-image"
+		style="opacity: .8">-->
+		@{
+			var role_name = Context.Session.GetString("role_name");
+			var app_name = Context.Session.GetString("app_name");
+			var pno = Context.Session.GetString("pno");
+			if (role_name.Contains("EIC"))
+			{
+				role_name = "HoD-DETP";
+			}
+		}
+		<span class="brand-text font-weight-light" style="display: inline;">@Context.Session.GetString("name")<br> (@role_name)<br />App : @Context.Session.GetString("app_name")</span>
+	</a>
+
+	<div class="sidebar">
+
+
+		<nav class="mt-2">
+			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+				<li class="nav-item">
+					<a href="@Url.Action("Index", "Home")" class="nav-link">
+						<p>QA Observation Dashboard</p>
+					</a>
+				</li>
+				@if (app_name == "QA" || new string[] { RoleNameConst.QA_OFFICER, RoleNameConst.HOD_QA_SHA, RoleNameConst.GM_TECHNICAL_SERVICES, RoleNameConst.CFO, RoleNameConst.HEAD_PROCUREMENT, RoleNameConst.ADMIN, RoleNameConst.SUPER_ADMIN }.Contains(role_name))
+				{
+				<li class="nav-item">
+					<a href="@Url.Action("Dashboard", "QaViolations")" class="nav-link">
+						<p>QA Violation Dashboard</p>
+					</a>
+				</li>
+				}
+				@if (role_name == "Admin" || role_name == "Super Admin")
+				{
+					<li class="user-panel nav-item has-treeview">
+						<a href="#" class="nav-link ">
+							<p>
+								Masters
+								<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="@Url.Action("Index", "User")" class="nav-link">
+									<p>User</p>
+								</a>
+							</li>
+							@if (role_name == "Admin" || role_name == "Super Admin")
+							{
+								<li class="nav-item">
+									<a href="@Url.Action("Index", "Divisions")" class="nav-link">
+										<p>Division</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="@Url.Action("Index", "Departments")" class="nav-link">
+										<p>Department</p>
+									</a>
+								</li>
+							}
+							<li class="nav-item">
+								<a href="@Url.Action("Index", "JobStoppedEmail")" class="nav-link">
+									<p>Job Stop Email</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				}
+				@if (app_name == "SHA" || role_name == "Super Admin")
+				{
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link ">
+							<p>
+								SHA
+								<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							@if (role_name == "Admin" || role_name == "Super Admin" || role_name == "Customer")
+							{
+								<li class="nav-item">
+									<a href="@Url.Action("Index", "SHARequest")" class="nav-link">
+										<p>Generate Request</p>
+									</a>
+								</li>
+							}
+
+							<li class="nav-item">
+								<a href="@Url.Action("Index","SHAViewRequests")" class="nav-link">
+									<p>View Requests</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				}
+				@if (app_name == "QA" || role_name == "Super Admin")
+				{
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link ">
+							<p>
+								QA
+								<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							@if (_configuration["QaLogUser"].Split(",").Contains(pno))
+							{
+								<li class="nav-item">
+									<a href="@Url.Action("Index", "QAObservation")" class="nav-link">
+										<p>Log Observation</p>
+									</a>
+								</li>
+							}
+							<li class="nav-item">
+								<a href="@Url.Action("Index","ViewObservation")" class="nav-link">
+									<p>View Observations</p>
+								</a>
+
+							</li>
+							<li class="nav-item">
+								<a href="~/QAReports/2021/QA_Report.xlsx" class="nav-link">
+									<p>Download Observations</p><br />
+									<span class="text-xs">
+										( 01/01/2019 to 16/09/2020 )
+									</span>
+								</a>
+
+							</li>
+						</ul>
+					</li>
+				}
+
+				@if (app_name == "QA" || new string[] { RoleNameConst.QA_OFFICER, RoleNameConst.HOD_QA_SHA, RoleNameConst.GM_TECHNICAL_SERVICES, RoleNameConst.CFO, RoleNameConst.HEAD_PROCUREMENT, RoleNameConst.ADMIN, RoleNameConst.SUPER_ADMIN}.Contains(role_name))
+				{
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link ">
+							<p>
+								QA Violation
+								<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							@if (new string[] { RoleNameConst.QA_OFFICER, RoleNameConst.ADMIN, RoleNameConst.SUPER_ADMIN }.Contains(role_name))
+							{
+								<li class="nav-item">
+									<a href="@Url.Action("Index", "QAViolations")" class="nav-link">
+										<p>QA Violation Request</p>
+									</a>
+								</li>
+							}
+							<li class="nav-item">
+								<a href="@Url.Action("Pending", "QAViolations")" class="nav-link">
+									<p>Pending Violation</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				}
+
+				@if (app_name == "Design" || role_name == "Super Admin")
+				{
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link ">
+							<p>
+								Design
+								<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+
+							<li class="nav-item">
+								<a href="@Url.Action("Index", "UploadDesignObservations")" class="nav-link">
+									<p>Upload Site Observation</p>
+								</a>
+							</li>
+
+							<li class="nav-item">
+								<a href="@Url.Action("Index","ViewDesignObservations")" class="nav-link">
+									<p>Download Site Observations</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				}
+				<li class="nav-item has-treeview">
+					<a href="#" class="nav-link ">
+						<p>
+							Reports
+							<i class="right fas fa-angle-left"></i>
+						</p>
+					</a>
+					<ul class="nav nav-treeview">
+						@*@if (app_name == "QA" && (new string[] { "Super Admin", "Admin", "QA Officer", "EIC-DETP" }.Contains(role_name)))*@
+
+						<li class="nav-item">
+							<a href="@Url.Action("Index", "QAReport")" class="nav-link">
+								<p>QA Observation</p>
+							</a>
+						</li>
+
+						@if (app_name == "SHA" && role_name == "SHA Team" || role_name == "Super Admin")
+						{
+							<li class="nav-item">
+								<a href="@Url.Action("Index", "SHAReport")" class="nav-link">
+									<p>SHA Requests</p>
+								</a>
+							</li>
+						}
+						@if (app_name == "Design" || role_name == "Super Admin")
+						{
+							<li class="nav-item">
+								<a href="@Url.Action("Index", "DesignReport")" class="nav-link">
+									<p>Design Site Observations</p>
+								</a>
+							</li>
+						}
+					</ul>
+				</li>
+			</ul>
+		</nav>
+		<!-- /.sidebar-menu -->
+	</div>
+	<!-- /.sidebar -->
+</aside>

@@ -1,0 +1,46 @@
+﻿@model DETP.model.Division
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+
+@{
+    ViewData["Title"] = "Create Division";
+}
+<div class="card m-3">
+    <div class="card-header">
+        <h4>Division</h4>
+    </div>
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="name" class="control-label"></label>
+                        <input asp-for="name" class="form-control" />
+                        <span asp-validation-for="name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DivisionHeadId" class="control-lebel"></label>
+                        <select asp-for="DivisionHeadId"class="form-control select2">
+                                <option value="">Choose..</option>
+                            @foreach(User user in ViewBag.Users)
+                            {
+                                <option value="@user.UserId">@user.Name / @user.PNo / @user.Email</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DivisionHeadId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>
+
+
+    </div>
+</div>

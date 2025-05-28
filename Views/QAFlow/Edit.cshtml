@@ -1,0 +1,470 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using DETP.model;
+
+@{
+    QAObservation observation = ViewBag.observation;
+}
+
+<div class="container-fluid text-center">
+    <div class="card">
+        <div class="card-body d-flex justify-content-center align-items-center flex-column">
+            <div class="card col-5 mt-2">
+                <div class="card-header">Observation</div>
+                <div class="card-body text-left">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Visit No.: With @observation.VisitNo
+                        </div>
+                        <div class="col-sm-6 text-right">
+                        </div>
+                    </div>
+                    @foreach (var img in ViewBag.oImageList)
+                    {
+                        string[] splitedImgs = img.Split("data:");
+
+                        foreach (var i in splitedImgs)
+                        {
+                            if (i == "")
+                            {
+                                continue;
+                            }
+                            var dataUrl = i;
+                            if (i.EndsWith(","))
+                            {
+                                dataUrl = i.Substring(0, i.Length - 1);
+                            }
+                            <img src="data:@dataUrl" height="100" data-type="observation" data-typeid="@observation.SerialNo" />
+                        }
+                    }
+                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add_image_modal" type="button" onclick="$('#type_id').val('@observation.SerialNo'); $('#type').val('observation')">Add Image</button>
+
+                    <div class="text-right">
+                        <i class="fa fa-check text-success"></i>
+                    </div>
+                </div>
+            </div>
+            @foreach (DataRow item in Model.Rows)
+            {
+                <div class="card col-5 mt-2">
+                    <div class="card-body text-left">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                Status: With @item.ItemArray[2].ToString().Replace("_", " ")
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                @{
+                                    DateTime dt = (DateTime)item.ItemArray[5];
+                                }
+                                @dt.ToString("dd MMM, yy hh:mm tt")
+                            </div>
+                        </div>
+                        From: @item.ItemArray[8] <br />
+                        To: @item.ItemArray[7]
+
+                        <br />
+
+                        @foreach (var img in ViewBag.imageList[Model.Rows.IndexOf(item)])
+                        {
+                            string[] splitedImgs = img.Split("data:");
+                            foreach (var i in splitedImgs)
+                            {
+                                if (i == "")
+                                {
+                                    continue;
+                                }
+
+                                var dataUrl = i;
+                                if (i.EndsWith(","))
+                                {
+                                    dataUrl = i.Substring(0, i.Length - 1);
+                                }
+                                <img src="data:@dataUrl" height="100" />
+                            }
+                        }
+
+                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add_image_modal" type="button" onclick="$('#type_id').val('@item.ItemArray[0]'); $('#type').val('flow')">Add Image</button>
+                        @if (item.ItemArray[6].ToString() == "Y")
+                        {
+                            <div class="text-right">
+                                <i class="fa fa-check text-success"></i>
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div class="text-right">
+                                <input type="hidden" value="@item.ItemArray[0]" id="flow_id" />
+                                <button type="button" class="btn" data-toggle="modal" data-target="#exampleModalCenter">
+                                    <i class="fa fa-edit text-success"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+                if (Model.Rows.IndexOf(item) != Model.Rows.Count - 1)
+                {
+                    <i class="fa fa-arrow-down"></i>
+                }
+            }
+            @if (ViewBag.flowCount == 0)
+            {
+                <button class="btn btn-primary" id="add-to-flow-btn">Add To Flow</button>
+            }
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Change To</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="user">Change user</label>
+                        <select type="text" class="form-control select2" id="user">
+                            <option>Select User</option>
+                            @foreach (DataRow item in ViewBag.users.Rows)
+                            {
+                                <option value="@item.ItemArray[0]">@item.ItemArray[1] / @item.ItemArray[2]/ @item.ItemArray[3]</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="changeTo()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="add_image_modal" role="dialog" aria-labelledby="add_image_modal_area" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_image_modal_title">Change To</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form enctype="multipart/form-data" action="@Url.Action("AddImage")" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="type" name="type" />
+                    <input type="hidden" id="type_id" name="type_id" />
+                    <div class="form-group">
+                        <label for="user">Add Image</label>
+                        <input type="file" id="file" name="imgs" multiple onchange="showImage(this)" />
+                        <div id="images" class="row">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addImage()">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="image_modal" role="dialog" aria-labelledby="imagemodalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="image_modal_title">Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="position: relative">
+                <img id="modal_image_id" style="width: 100%" />
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @*<button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>*@
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="add-flow" role="dialog" aria-labelledby="add-flowTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-flow">Add New Flow</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-to-flow-form" action="@Url.Action("AddNewFlow")">
+                    <input type="hidden" value="@observation.SerialNo" name="observationId" />
+                    <div class="row">
+                        <div class="form-group col-sm-12" style="overflow: hidden">
+                            <label>Select User</label>
+                            <div>
+                                <select class="form-control select2" name="userId" required>
+                                    @foreach (DataRow item in ViewBag.users.Rows)
+                                    {
+                                        <option value="@item.ItemArray[0]">@item.ItemArray[1] / @item.ItemArray[2]/ @item.ItemArray[3]</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12">
+                            <label>Change Compliance Date</label>
+                            <label>
+                            <input type="radio" name="changeComplainceDate" value="Yes" />
+                            Yes
+                            </label>
+                            <label>
+                                <input type="radio" name="changeComplainceDate" value="No" checked/>
+                                No
+                            </label>
+                        </div>
+                        <div class="form-group col-sm-12" id="compliance-target-date-form-group">
+                            <label>Compliance Target Date</label>
+                            <input type="date" class="form-control" name="complianceTargetDate">
+                        </div>
+                        
+                    </div>
+                    <div class="text-right">
+                        <button class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+                <h2 class="mt-2">Observation</h2>
+                <div class="row">
+                    <div class="col-sm-12 form-group">
+                        <label>Site Incharge</label>
+                        <p class="border rounded p-2">
+                            <span>@observation.SiteIncharge.Name / @observation.SiteIncharge.Email / @observation.SiteIncharge.PNo</span>
+                        </p>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label>Project Incharge</label>
+                        <p class="border rounded p-2">
+                            <span>@observation.ProjectIncharge.Name / @observation.ProjectIncharge.Email / @observation.ProjectIncharge.PNo</span>
+                        </p>
+                    </div>
+
+                    <div class="col-sm-12 form-group">
+                        <label>Department Head</label>
+                        <p class="border rounded p-2">
+                            <span>@observation.DeptHod.Name / @observation.DeptHod.Email / @observation.DeptHod.PNo</span>
+                        </p>
+                    </div>
+
+                    <div class="col-sm-12 form-group">
+                        <label>Business Head</label>
+                        <p name="business_head" id="business_head" class="border rounded p-2">
+                            <span>@observation.BusinessHead.Name / @observation.BusinessHead.Email / @observation.BusinessHead.PNo</span>
+                        </p>
+                    </div>
+
+                    <div class="col-sm-12 form-group">
+                        <label>Sectional Head QA</label>
+                        <p class="border rounded p-2">
+                            <span>@observation.HeadDetp.Name / @observation.HeadDetp.Email / @observation.HeadDetp.PNo</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/dist/js/qaobservation.js"></script>
+
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
+    <script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/dist/js/editobservation.js"></script>
+    <script>
+
+
+        async function changeTo() {
+            var userId = $('#user').val();
+            var response = await fetch('@Url.Action("ChangeTo", "QAFlow")', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    "flowId": $('#flow_id').val(),
+                    "userId": userId,
+                })
+            })
+
+            var json = await response.json();
+            if (json['status'] == 'success') {
+                window.location.reload()
+            }
+
+            var img_array = [];
+
+        }
+
+        var imgs = [];
+        imageIndex = 0;
+        $('document').ready(function () {
+            $('img').on('click', function () {
+                $('#modal_image_id').attr('src', $(this).attr("src"));
+                $('#image_val').val($(this).attr("src"));
+                $('#image_type').val($(this).data('type'))
+                $('#image_type_id').val($(this).data('typeid'))
+                $('#image_modal').modal('show');
+            });
+        });
+
+        function removeImg(el, index) {
+            $(el).parent().remove();
+            imgs.splice(index, 1);
+            imageIndex--;
+        }
+
+        function getBase64(file) {
+            img_array = [];
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                img_array.push(reader.result);
+                SubmitData();
+            };
+            reader.onerror = function (error) {
+                console.log('Error: ', error);
+            };
+        }
+
+
+
+        function showImage(input) {
+            if (input.files && input.files[0]) {
+
+                var files = input.files;
+                for (var i = 0; i < files.length; i++) {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(files[i]);
+                    reader.onload = function (e) {
+                        if (e.target.result.startsWith("data:image")) {
+                            $('#images').append(`
+                                               <div class="card" style="width: 10rem;">
+
+                                                    <a href="#" class="text-danger" onclick="removeImg(this,${imageIndex});return false;" style="position: absolute; right: 0;">
+                                                        <i class="fa fa-times"></i>
+                                                    </a>
+                                                    <img class="card-img-top" src='${e.target.result}' />
+
+                                                </div>
+                                            `);
+                        }
+                        else {
+                            $('#images').append(`
+                                               <div class="card mr-3" style="max-height: 8rem;">
+
+                                                    <a href="#" class="text-danger" onclick="removeImg(this,${imageIndex});return false;" style="position: absolute; right: 5px;">
+                                                        <i class="fa fa-times"></i>
+                                                    </a>
+
+                                                        <i class="fa fa-file-pdf fa-5x"></i>
+                                                    <div class="text-center mt-1">
+                                                        <a href="#" onclick="openInNew('${e.target.result}'); return false;" target="_blank" class="btn btn-sm btn-primary">View</a>
+                                                    </div>
+
+                                                </div>
+                                            `);
+                        }
+                        imageIndex++;
+                        imgs.push(e.target.result);
+
+                    };
+
+                }
+            }
+        }
+
+        function addImage() {
+            img_array = [];
+            var files = document.getElementById('file').files;
+            for (var i = 0; i < files.length; i++) {
+                if (files.length > 0) {
+
+                    var ext = files[i].name.substr(-3);
+                    if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                        getBase64(files[i]);
+                    }
+                }
+            }
+
+            console.log(img_array);
+
+            let myData = new FormData();
+            myData.append("type", $('#type').val())
+            myData.append("type_id", $('#type_id').val())
+            myData.append("imgs", JSON.stringify(imgs))
+
+            console.log(myData.get("imgs"));
+            console.log(img_array);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddImage")',
+                data: myData,
+                contentType: false,
+                processData: false,
+                error: function (result) {
+                    alert(result.message);
+                },
+                success: function (result) {
+                    if (result.status == true) {
+                        window.location.href = "@Url.Action("Edit")";
+                    }
+                    else {
+                        alert(result.message);
+                    }
+                }
+            });
+        }
+        $('#add-to-flow-btn').on('click', () => {
+            $('#add-flow').modal('show');
+        })
+        function addFlowSubmit() {
+            const data = $('#add-to-flow-form').submit();
+        }
+        $(document).on('ready', () => {
+            $('#target_date').datepicker({
+                format: 'L',
+                minDate: new Date()
+            });
+        })
+
+        $("input[name='changeComplainceDate']").on('change', () => {
+            const val = $("input[name='changeComplainceDate']:checked").val();
+            if(val == "Yes"){
+                $('#compliance-target-date-form-group').show()
+            }
+            else {
+                $('#compliance-target-date-form-group').hide()
+            }
+        })
+        $('#compliance-target-date-form-group').hide()
+
+    </script>
+}

@@ -1,0 +1,1421 @@
+﻿@model Tuple<DataTable, DataTable, DataTable, DataTable, DataTable>
+@using System.Data;
+@using Microsoft.AspNetCore.Http;
+<section class="content">
+    <!-- request -->
+    @{ DateTime defaultDate = default(DateTime);
+
+        var userDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        var reqst = Model.Item1.Rows[0].ItemArray[33].ToString();
+    }
+    <i class="fa fa-2x fa-print float-right" style="color: #007bff;" onclick="window.print()"></i>
+
+    <i class="fa fa-2x fa-minus-circle float-right" style="color: #007bff;" onclick="collapse()"></i>
+    <i class="fa fa-2x fa-plus-circle float-right" style="color: #007bff;" onclick="expand()"></i>
+    <br>
+    <br>
+    <script>
+        function expand() {
+            $('.collapse').collapse('show');
+        }
+        function collapse() {
+            $('.collapse').collapse('hide');
+        }
+    </script>
+    <form role="form" id="myform">
+        <div id="accordion">
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#Observation-Details">
+                            Request Details
+                        </a>
+                    </h4>
+                </div>
+                <div id="Observation-Details" class="panel-collapse collapse">
+                    <!-- form start -->
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="date">Request Date Time</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[2].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Request No</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[3].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="Status">Status</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[33].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <select class="form-control" disabled>
+
+                                <option value="@Model.Item1.Rows[0].ItemArray[34].ToString()">@Model.Item1.Rows[0].ItemArray[34].ToString()</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name_of_structure">Name of Structure</label>
+                            <input type="text" class="form-control" placeholder="Name of Structure" value="@Model.Item1.Rows[0].ItemArray[5].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="cost_center">Cost Center</label>
+                            <input type="number" class="form-control" placeholder="Cost Center" value="@Model.Item1.Rows[0].ItemArray[6].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select name="priority" id="priority" class="form-control" disabled>
+                                <option>@Model.Item1.Rows[0].ItemArray[7].ToString()</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_person_name">Contact Person Name</label>
+                            <input type="text" class="form-control" placeholder="Contact Person Name" value="@Model.Item1.Rows[0].ItemArray[8].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_person_email">Contact Person Email</label>
+                            <input type="email" class="form-control" placeholder="Contact Person Email" value="@Model.Item1.Rows[0].ItemArray[9].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_person_phone">Contact Person Phone</label>
+                            <input type="tel" class="form-control" placeholder="Contact Person Phone" value="@Model.Item1.Rows[0].ItemArray[10].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <select class="form-control" disabled>
+                                <option>@Model.Item1.Rows[0].ItemArray[11].ToString()</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Structure Type</label>
+                            <select class="form-control" disabled>
+                                <option>@Model.Item1.Rows[0].ItemArray[12].ToString()</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="number_of_structure">Number of Structure</label>
+                            <input type="number" class="form-control" placeholder="Number of Structure" value="@Model.Item1.Rows[0].ItemArray[13].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" rows="3" placeholder="Brief Description" disabled>@Model.Item1.Rows[0].ItemArray[14].ToString()</textarea>
+                        </div>
+
+                        <div class="d-flex" style="gap: 4px">
+                            @foreach (ShaRequestImage item in ViewBag.Attachment)
+                            {
+                                <div class="img-fluid">
+                                    <img src="~/uploads/@item.Path" style="width: 150px; object-fit: cover" />
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!Model.Item1.Rows[0].ItemArray[15].ToString().Equals(""))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#pdstdetails">
+                            Decision by SHA Team
+                        </a>
+                    </h4>
+                </div>
+                <div id="pdstdetails" class="panel-collapse collapse">
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="Status">Decision by SHA Team</label>
+                            <select class="form-control" disabled>
+                                <option value="">@Model.Item1.Rows[0].ItemArray[15].ToString()</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="Status">Decision by</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[35].ToString()" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="Status">Decision on</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[17].ToString()" disabled>
+                        </div>
+                        @if (!@Model.Item1.Rows[0].ItemArray[18].ToString().Equals(""))
+                        {
+                            <div class="form-group">
+                                <label for="Status">Reject Remarks</label>
+                                <textarea class="form-control" rows="3" placeholder="" disabled>@Model.Item1.Rows[0].ItemArray[18].ToString()</textarea>
+                            </div>
+                        }
+                        <div class="form-group">
+                            <label for="Status">Planned Visit Date</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[19].ToString()" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Item1.Rows[0].ItemArray[24].ToString().Equals("0") && !Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Visual Inspection") && Context.Session.GetString("role_name").Equals("SHA Team"))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#vdetails">
+                            Visit by SHA Team
+                        </a>
+                    </h4>
+                </div>
+                <div id="vdetails" class="panel-collapse collapse">
+
+                    <div class="card-body">
+                        <div class="form-group">
+                            <table border="2" cellpadding="10">
+                                <thead>
+                                    <tr>
+                                        <th>Sl</th>
+                                        <th>Photograph</th>
+                                        <th>Observation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ph">
+                                    @if (Model.Item4.Rows.Count > 0)
+                                    {
+                                        @for (int aa = 0; aa < Model.Item4.Rows.Count; aa++)
+                                        {
+                                            int j = 1;
+                                            <tr>
+                                                <td> @j</td>
+                                                <td> <img src="@Model.Item4.Rows[aa].ItemArray[1].ToString()" /></td>
+                                                <td> @Model.Item4.Rows[aa].ItemArray[3].ToString()</td>
+                                            </tr>
+
+                                            j++;
+
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Site Visited on</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[21].ToString()" class="form-control" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date">Site Visited by</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[36].ToString()" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Item1.Rows[0].ItemArray[25].ToString().Equals("01-01-1900 00:00:00"))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#virdetails">
+                            VIR by SHA Team
+                        </a>
+                    </h4>
+                </div>
+                <div id="virdetails" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="date">VIR Completion Reported On</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[25].ToString()" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+        @if (!Model.Item1.Rows[0].ItemArray[26].ToString().Equals("01-01-1900 00:00:00"))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#ccdetails">
+                            Confirmation by Customer
+                        </a>
+                    </h4>
+                </div>
+                <div id="ccdetails" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="date">Arrangement Confirmation by Requester Reported On</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[26].ToString()" class="form-control" disabled>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="date">Arrangement Description</label>
+                            <textarea class="form-control" rows="3" disabled>@Model.Item1.Rows[0].ItemArray[23].ToString()</textarea>
+</div>
+                    </div>
+                </div>
+            </div>
+
+        }
+        @if (!Model.Item1.Rows[0].ItemArray[27].ToString().Equals("01-01-1900 00:00:00"))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#ttdetails">
+                            Test Date Planning by SHA Team
+                        </a>
+                    </h4>
+                </div>
+                <div id="ttdetails" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="date">Planned Test Date</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[27].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Planned Test Date Entry By</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[37].ToString()" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Planned Test Date Entry Date Time</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[29].ToString()" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+        @if (!Model.Item1.Rows[0].ItemArray[30].ToString().Equals("01-01-1900 00:00:00") && !Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Test Data") && Context.Session.GetString("role_name").Equals("SHA Team"))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#tdsdetails">
+                            Test Data / Results & Samples
+                        </a>
+                    </h4>
+                </div>
+                <div id="tdsdetails" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="date">Actual Test Date Entry Date Time</label>
+                            <input type="text" value="@Model.Item1.Rows[0].ItemArray[30].ToString()" class="form-control" disabled>
+                        </div>
+                        @if (Model.Item2 != null)
+                        {
+                            <div class="form-group">
+                                <label for="date">Tests to be Conducted</label>
+                            </div>
+
+                            <table border="2" cellpadding="10">
+                                <thead>
+                                    <tr>
+                                        <th>Test Name</th>
+                                        <th>Test No</th>
+                                        <th>Test Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="testbody">
+                                    @for (int i = 0; i < Model.Item2.Rows.Count; i++)
+                                    {
+                                        <tr>
+                                            <td> @Model.Item2.Rows[i].ItemArray[1].ToString()</td>
+                                            <td>
+                                                @if (Model.Item5 != null)
+                                                {
+                                                    int t=0;
+                                                    @for (int h = 0; h < Model.Item5.Rows.Count; h++)
+                                                    {
+                                                        var a = Model.Item5.Rows[h].ItemArray[1].ToString();
+                                                        var b = Model.Item2.Rows[i].ItemArray[0].ToString();
+                                                        @if (a.Equals(b))
+                                                        {
+                                                            t++;
+
+                                                        }
+                                                    }
+                                                    @t;
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (Model.Item5 != null)
+                                                {
+                                                    int ser = 1;
+                                                    @for (int h = 0; h < Model.Item5.Rows.Count; h++)
+                                                    {
+                                                        var a = Model.Item5.Rows[h].ItemArray[1].ToString();
+                                                        var b = Model.Item2.Rows[i].ItemArray[0].ToString();
+                                                        @if (a.Equals(b))
+                                                        {
+                                                            <p>@ser.ToString() :- @Model.Item5.Rows[h].ItemArray[2].ToString()</p>
+                                                            ser++;
+                                                        }
+                                                    }
+                                                }
+                                            </td>
+                                        </tr>
+
+
+                                    }
+                                </tbody>
+                            </table>
+                            <br>
+                        }
+                        @if (Model.Item3 != null)
+                        {
+                            <div class="form-group">
+                                <label for="date">Samples to be Collected</label>
+                            </div>
+                            <table border="2" cellpadding="10">
+                                <thead>
+                                    <tr>
+                                        <th>Sample Name</th>
+                                        <th>Sample No</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sbody">
+                                    @for (int i = 0; i < Model.Item3.Rows.Count; i++)
+                                    {
+                                        <tr>
+                                            <td> @Model.Item3.Rows[i].ItemArray[1].ToString()</td>
+                                            <td> @Model.Item3.Rows[i].ItemArray[2].ToString()</td>
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Item1.Rows[0].ItemArray[31].ToString().Equals("01-01-1900 00:00:00"))
+        {
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#jddetails">
+                            Job Completed
+                        </a>
+                    </h4>
+                </div>
+                <div id="jddetails" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="Status">Job Completed Reported On</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[31].ToString()" disabled>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="Status">Job Completed by</label>
+                            <input type="text" class="form-control" value="@Model.Item1.Rows[0].ItemArray[37].ToString()" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card card-primary">
+            @if (!Model.Item1.Rows[0].ItemArray[33].Equals("Job Completed"))
+            {
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#ardetails">
+                            @Model.Item1.Rows[0].ItemArray[33].ToString()
+                        </a>
+                    </h4>
+                </div>
+            }
+            <div id="ardetails" class="panel-collapse collapse  show">
+                <div class="card-body">
+                    @{String btnshow = "no"; }
+
+                    @if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending from SHA Team") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+
+
+                        <div class="form-group">
+                            <label for="Status">Decision by SHA Team</label>
+                            <select name="decision" id="decision" class="form-control">
+                                <option value=""></option>
+                                <option value="Accepted">Accepted</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div><div class="form-group rej" style="display:none">
+                            <label for="Status">Reject Remarks</label>
+                            <textarea name="remarks" id="remarks" class="form-control" rows="3" placeholder=""></textarea>
+                        </div><div class="form-group acc" style="display:none">
+                            <label for="Status">Planned Visit Date</label>
+                            <input type="date" id="planned_visit_date" class="form-control" name="planned_visit_date">
+                        </div>
+                        <script>
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        decision: {
+                                                            required: true
+                                                        },
+                                                        remarks: {
+                                                            required: function (element) {
+                                                                return $("#decision").val() == "Accepted";
+                                                            }
+                                                        },
+                                                        planned_visit_date: {
+                                                            required: function (element) {
+                                                                return $("#decision").val() == "Rejected";
+                                                            }
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            decision: $('#decision').val(),
+                                                            remarks: $('#remarks').val(),
+                                                            planned_visit_date: $('#planned_visit_date').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                        </script>
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Visual Inspection") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+                        <div class="form-group">
+                            <label for="date">Actual Visit Date Time</label>
+                            <input type="text" value="@userDt" class="form-control" id="date" disabled>
+                        </div>
+
+
+
+                        @if (Model.Item4 != null)
+                        {
+                            <table border="2" cellpadding="10">
+                                <thead>
+                                    <tr>
+                                        <th>Photograph</th>
+                                        <th>Observation</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ph">
+
+                                    @for (int aa = 0; aa < Model.Item4.Rows.Count; aa++)
+                                    {
+                                        <tr>
+                                            <td> <img src="@Model.Item4.Rows[aa].ItemArray[1].ToString()" width="200" height="200" /></td>
+                                            <td> @Model.Item4.Rows[aa].ItemArray[3].ToString()</td>
+                                            <td>
+                                                @if (reqst.Equals("Pending for Visual Inspection"))
+                                                {<a href="@Url.Action("DeletePhoto", "EditSHARequest", new { id = @Model.Item4.Rows[aa].ItemArray[0].ToString(), observation_id = @Model.Item4.Rows[aa].ItemArray[2].ToString() })"><i class="fa fa-minus-circle"></i></a>}
+                                            </td>
+                                        </tr>
+
+
+                                    }
+
+
+                                </tbody>
+                            </table>
+                        }
+
+
+                        <div class="form-group">
+                            <table border="2" cellpadding="10" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Photographs (Only Image Files Allowed)
+                                        </th>
+                                        <th>Observation Details</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="image_app">
+
+                                    <tr id="row0">
+                                        <td> <input type="file" class="form-control" id="fileInput" name="img[]" onchange="upimg(this,0)" accept="image/*" multiple> <textarea name="img_data[]" id="img_data" class="form-control" rows="3" placeholder="" hidden></textarea></td>
+                                        <td> <textarea name="observation" id="observation" class="form-control" rows="3" placeholder=""></textarea></td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary float-right" onclick="addimgrow()">Add</button>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            <label for="Status">Action</label>
+                            <select name="ac" id="ac" class="form-control">
+                                <option value="save">Save</option>
+                                <option value="fwd">Save & Forward</option>
+                            </select>
+                        </div>
+                        <script>
+                                var lineNo2 = 1;
+
+                                function addimgrow() {
+                                    markup = "  <tr id='row" + lineNo2 + "'><td> <input type='file' name='img[]' onChange='upimg(this," + lineNo2 +")' class='form-control' id='fileInput' accept='image/*' multiple> <textarea name='img_data[]' id='img_data' class='form-control' rows='3' placeholder='' hidden></textarea></td> <td> <textarea name='observation' id='observation' class='form-control' rows='3' placeholder=''></textarea></td> <td></td></tr>";
+
+                                    lineNo2 = lineNo2+1;
+                                    tableBody = $("#image_app");
+                                    tableBody.append(markup);
+                                }
+
+                                function getBase64(file,ln2) {
+                                var reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                    reader.onload = function () {
+                                        $('#row'+ln2).find('textarea').first().val(reader.result);
+                                    };
+                                reader.onerror = function (error) {
+                                    console.log('Error: ', error);
+                                    };
+                            }
+                                function upimg(s,ln) {
+                                    img_array = [];
+                                    var files = s.files;
+                                    for (var i = 0; i < files.length; i++) {
+                                        if (files.length > 0) {
+                                            var ext = files[i].name.substr(-3);
+                                            if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif") {
+                                                getBase64(files[i],ln);
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        observation: {
+                                                            required: true
+                                                        },
+                                                        photos: {
+                                                            required: true
+
+                                                        },
+                                                        ac: {
+                                                            required: true
+
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            observation: $("textarea[id='observation']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            photos: $("textarea[id='img_data']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            ac: $('#ac').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        console.log(dataToSend);
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                        </script>
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Approval Pending for Visual Inspection") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+                        <div class="form-group">
+                            <label for="date">VIR Completed?</label>
+                            <select name="vircompleted" id="vircompleted" class="form-control">
+                                <option value=""></option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+
+                        <script>
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        vircompleted: {
+                                                            required: true
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            vircompleted: $('#vircompleted').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                        </script>
+
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Requester Confirmation") && Context.Session.GetString("role_name").Equals("Customer"))
+                    {
+                        btnshow = "yes";
+                        <div class="form-group">
+                            <label for="date">Arrangement Completed?</label>
+                            <select name="acompleted" id="acompleted" class="form-control">
+                                <option value=""></option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Arrangement Description?</label>
+                            <textarea name="arrdes" id="arrdes" class="form-control" rows="3" placeholder=""></textarea>
+                        </div>
+                        <script>
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        acompleted: {
+                                                            required: true
+                                                        },
+                                                        arrdes: {
+                                                            required: true
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            acompleted: $('#acompleted').val(),
+                                                            arrdes: $('#arrdes').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                        </script>
+
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Test Plan Date Confirmation") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+                        <div class="form-group">
+                            <label for="date">Planned Test Date</label>
+                            <input type="date" id="ptdate" name="ptdate" class="form-control" />
+                        </div>
+                        <script>
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        ptdate: {
+                                                            required: true
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            ptdate: $('#ptdate').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                        </script>
+
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Test Data") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+                        @if (Model.Item2 != null)
+                        {
+                            <div class="form-group">
+                                <label for="date">Tests to be Conducted</label>
+                            </div>
+                            <table border="2" cellpadding="10" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Test Name</th>
+                                        <th>Test No</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Item2.Rows.Count; i++)
+                                    {
+                                        <tr>
+                                            <td> @Model.Item2.Rows[i].ItemArray[1].ToString()</td>
+                                            <td> @Model.Item2.Rows[i].ItemArray[2].ToString()</td>
+                                            <td>
+                                                <a href="@Url.Action("DeleteTest", "EditSHARequest", new { id = @Model.Item2.Rows[i].ItemArray[0].ToString(), observation_id = @Model.Item2.Rows[i].ItemArray[6].ToString() })"><i class="fa fa-minus-circle"></i></a>
+                                            </td>
+                                        </tr>
+
+
+                                    }
+                                </tbody>
+                            </table>
+                            <br>
+                        }
+                        @if (Model.Item3 != null)
+                        {
+                            <div class="form-group">
+                                <label for="date">Samples to be Collected</label>
+                            </div>
+                            <table border="2" cellpadding="10" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Sample Name</th>
+                                        <th>Sample No</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sbody">
+                                    @for (int i = 0; i < Model.Item3.Rows.Count; i++)
+                                    {
+                                        <tr>
+                                            <td> @Model.Item3.Rows[i].ItemArray[1].ToString()</td>
+                                            <td> @Model.Item3.Rows[i].ItemArray[2].ToString()</td>
+                                            <td>
+                                                <a href="@Url.Action("DeleteSample", "EditSHARequest", new { id = @Model.Item3.Rows[i].ItemArray[0].ToString(), observation_id = @Model.Item3.Rows[i].ItemArray[3].ToString() })"><i class="fa fa-minus-circle"></i></a>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        <div class="form-group">
+                            <label for="date">Tests to be Conducted</label>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Test No</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="testbody">
+                                <tr>
+                                    <td> <input type="text" id="tname" name="tname[]" class="form-control" /></td>
+                                    <td> <input type="text" id="tno" name="tno[]" class="form-control" /></td>
+                                    <td> <button type="button" class="btn btn-primary float-right" onclick="addtestrow()">Add</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <div class="form-group">
+                            <label for="date">Samples to be Collected</label>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sample Name</th>
+                                    <th>Sample No</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="sbody">
+                                <tr>
+                                    <td> <input type="text" id="sname" name="sname[]" class="form-control" /></td>
+                                    <td> <input type="text" id="sno" name="sno[]" class="form-control" /></td>
+                                    <td> <button type="button" class="btn btn-primary float-right" onclick="addsrow()">Add</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="form-group">
+                            <label for="Status">Action</label>
+                            <select name="ac" id="ac" class="form-control">
+                                <option value="save">Save</option>
+                                <option value="fwd">Save & Forward</option>
+                            </select>
+                        </div>
+
+                        <script>
+                            function addtestrow() {
+
+                                let lineNo = 1;
+                                markup = "<tr><td> <input type='text' id='tname' name='tname[]' class='form-control' /></td> <td> <input type='text' id='tno' name='tno[]' class='form-control' /></td ><td></td></tr>";
+
+                                tableBody = $("#testbody");
+                                tableBody.append(markup);
+                                lineNo++;
+                            }
+                            function addsrow() {
+
+                                let lineNo = 1;
+                                markup = "<tr><td> <input type='text' id='sname' name='same[]' class='form-control' /></td> <td> <input type='text' id='sno' name='sno[]' class='form-control' /></td ><td></td></tr>";
+
+                                tableBody = $("#sbody");
+                                tableBody.append(markup);
+                                lineNo++;
+                            }
+
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            tname: $("input[id='tname']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            tno: $("input[id='tno']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            sname: $("input[id='sname']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            sno: $("input[id='sno']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            ac: $('#ac').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                         $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+
+                                                    }
+                                                }
+                        </script>
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Test Results") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+                        <div class="form-group">
+                            <label for="date">Tests to be Conducted</label>
+                        </div>
+                        if (Model.Item2 != null)
+                        {
+                            <table border="2" cellpadding="10" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Test Name</th>
+                                        <th>Test No</th>
+                                        <th>Test Result</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Item2.Rows.Count; i++)
+                                    {
+                                        var count2 = Int16.Parse(Model.Item2.Rows[i].ItemArray[2].ToString());
+                                        <tr>
+                                            <td> @Model.Item2.Rows[i].ItemArray[1].ToString()</td>
+                                            <td> @Model.Item2.Rows[i].ItemArray[2].ToString()</td>
+                                            <td>
+                                                @if (Model.Item5 != null)
+                                                {
+                                                    int ser2 = 0;
+                                                    @for (int h = 0; h < Model.Item5.Rows.Count; h++)
+                                                    {
+                                                        var a = Model.Item5.Rows[h].ItemArray[1].ToString();
+                                                        var b = Model.Item2.Rows[i].ItemArray[0].ToString();
+                                                        @if (a.Equals(b))
+                                                        {
+                                                            ser2++;
+                                                            count2--;
+                                                           <p>@ser2.ToString() - @Model.Item5.Rows[h].ItemArray[2].ToString() <a href="@Url.Action("DeleteResult", "EditSHARequest", new { id = @Model.Item5.Rows[h].ItemArray[0].ToString(), observation_id = @Model.Item2.Rows[i].ItemArray[6].ToString() })"><i class="fa fa-minus-circle"></i></a></p>
+
+                                                        }
+                                                    }
+                                                }
+                                                @if (count2 <= 0)
+                                                {
+                                                    count2 = 1;
+                                                }
+                                                @for (int ko = 0; ko < count2; ko++)
+                                                {
+                                                    <input type="hidden" id="old_lineno" name="old_lineno[]" class="form-control" value="@i" />
+
+                                                    <input type="text" id="old_tr" name="old_tr[]" class="form-control" placeholder="Enter Test Result" />
+                                                }
+                                                <input type="hidden" id="old_t_id" name="old_t_id[]" class="form-control" value="@Model.Item2.Rows[i].ItemArray[0].ToString()" />
+                                                <button type="button" onclick="addoresultrow(this)">Add</button>
+                                            </td>
+                                            <td> <a href="@Url.Action("DeleteTest", "EditSHARequest", new { id = @Model.Item2.Rows[i].ItemArray[0].ToString(), observation_id = @Model.Item2.Rows[i].ItemArray[6].ToString() })"><i class="fa fa-minus-circle"></i></a></td>
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        <hr>
+                        <table border="2" width="100%" cellpadding="10">
+                            <thead>
+                                <tr>
+                                    <th>Lab Test Name</th>
+                                    <th>Lab Test No</th>
+                                    <th>Lab Test Results</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="testbody1">
+                                <tr>
+                                    <td> <input type="text" id="tname" name="tname[]" class="form-control" /></td>
+                                    <td> <input type="text" id="tno" name="tno[]" class="form-control" /></td>
+                                    <td id="0">
+                                        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center">
+                                            <input type="hidden" id="lineno" value="0" name="lineno[]" class="form-control" /> <input type="text" id="tr" name="tr[]" class="form-control" />    <i class="fa fa-plus-circle float-right" style="color: #007bff;" onclick="addresultrow(this)"></i>
+                                        </div>
+                                    </td>
+                                    <td> <button type="button" class="btn btn-primary float-right" onclick="addtestrow1()">Add</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <hr>
+                        <div class="form-group">
+                            <label for="Status">Action</label>
+                            <select name="ac" id="ac" class="form-control">
+                                <option value="save">Save</option>
+                                <option value="fwd">Save & Forward</option>
+                            </select>
+                        </div>
+                        <script>
+                                var lineNo = 1;
+                            function addtestrow1() {
+
+                                markup = "<tr><td> <input type='text' id='tname' name='tname[]' class='form-control' /></td> <td> <input type='text' id='tno' name='tno[]' class='form-control' /><td id='" + lineNo + "'><div style='display: flex;flex-direction:row;justify-content:center;align-items:center'><input type='hidden' id='lineno' value='" + lineNo +"' name='lineno[]' class='form-control' /><input type='text' id='tr' name='tr[]' class='form-control' /><i class='fa fa-plus-circle float-right' style='color:#007bff;' onclick='addresultrow(this)'></i></div></td></td ><td></td></tr>";
+
+                                tableBody = $("#testbody1");
+                                tableBody.append(markup);
+                                lineNo++;
+                            }
+                            function addresultrow(s) {
+                                var nr = $(s).closest('td').find("input").first().val();
+                                markup = "<input type='hidden' id='lineno' value='"+nr+"' name='lineno[]' class='form-control' /> <input type='text' id='tr' name='tr[][]' class='form-control' />";
+                                tableBody = $(s).closest('td');
+                                $(s).closest('td').find("input").first().val(nr);
+                                tableBody.append(markup);
+                            }
+
+                            function addoresultrow(s) {
+                                var nr2 = $(s).closest('td').find("input").first().val();
+
+        markup = "<input type='hidden' id='old_lineno' name='old_lineno[]' class='form-control' value='"+nr2+"' /><input type='text' id='old_tr' name='old_tr[]' class='form-control' placeholder='Enter Test Result' /><button type='button' onclick='addoresultrow(this)'>Add</button><br>";
+                                tableBody = $(s).closest('td');
+                                tableBody.append(markup);
+                            }
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            old_t_id: $("input[id='old_t_id']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            old_tr: $("input[id='old_tr']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            old_lineno: $("input[id='old_lineno']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            tname: $("input[id='tname']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            tno: $("input[id='tno']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            tr: $("input[id='tr']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            lineno: $("input[id='lineno']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            ac: $('#ac').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                         $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+
+                                                    }
+                                                }
+                        </script>
+                    }
+                    else if (Model.Item1.Rows[0].ItemArray[33].Equals("Pending for Final Report") && Context.Session.GetString("role_name").Equals("SHA Team"))
+                    {
+                        btnshow = "yes";
+                        <div class="form-group">
+                            <label for="date">Job Completed</label>
+                            <select name="jobc" id="jobc" class="form-control">
+                                <option value=""></option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <script>
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        jobc: {
+                                                            required: true
+                                                        }
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            jobc: $('#jobc').val(),
+                                                            status: '@Model.Item1.Rows[0].ItemArray[33].ToString()',
+                                                            request_id: '@Model.Item1.Rows[0].ItemArray[0].ToString()'
+                                                        }
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("index", "SHAViewRequests")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                        </script>
+                    }
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+        @if (btnshow == "yes")
+        {
+            <div class="card-footer">
+                <button id="submit_sha_request" type="button" class="btn btn-primary float-right" onclick="SubmitRequest()" data-request-url="@Url.Action("Update", "EditSHARequest")">Submit</button>
+            </div>
+        }
+    </form>
+
+
+    <!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please Wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Request Updated Successfully!<br /><br /><center>Please be patient you are being redirected...</center>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+<script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script>
+
+
+    $('#decision').on('change', function () {
+        if (this.value == "Accepted") {
+            $('.acc').css('display', 'block');
+            $('.rej').css('display', 'none');
+        }
+        if (this.value == "Rejected") {
+            $('.rej').css('display', 'block');
+            $('.acc').css('display', 'none');
+        }
+    });
+
+</script>

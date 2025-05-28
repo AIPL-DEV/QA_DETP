@@ -1,0 +1,47 @@
+﻿@model IEnumerable<DETP.model.QaViolation.QaViolationCategory>
+
+@{
+	ViewData["Title"] = "Category";
+}
+
+@section Head {
+	<link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+}
+
+<div class="container">
+	<div class="card">
+
+		<div class="d-flex justify-content-end p-2">
+			<a asp-action="Create" class="btn btn-primary">Create New</a>
+		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>
+						@Html.DisplayNameFor(model => model.Name)
+					</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(modelItem => item.Name)
+						</td>
+						<td>
+							<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary">Edit</a>
+							<button onclick="deleteCategory(@item.Id)" class="btn btn-danger">Delete</button>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/plugins//sweetalert2/sweetalert2.min.js"></script>
+	<script src="dist/js//qaviolation/category.js"></script>
+}	

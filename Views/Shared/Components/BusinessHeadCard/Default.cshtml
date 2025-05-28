@@ -1,0 +1,152 @@
+﻿@model BusinessHeadCardModel
+
+@{
+    string convertDate(string strDate)
+    {
+        DateTime date;
+        DateTime.TryParse(strDate, out date);
+        var parsedDate = date.ToString("dd-MM-yyyy");
+        if ("01-01-1970" == parsedDate)
+            return "";
+        if ("01-01-0001" == parsedDate)
+        {
+            return "";
+        }
+        if ("01-01-1900" == parsedDate)
+        {
+            return "";
+        }
+        return parsedDate;
+    }
+}
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#business-head-assignee-@Model.Index">
+                Business Head
+            </a>
+        </h4>
+    </div>
+    <div id="business-head-assignee-@Model.Index" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-6 form-group">
+                    <label>Assign To</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.BusinessHead.AssignTo?.Name</span>
+                    </p>
+                </div>
+
+                <div class="col-6 form-group">
+                    <label>Decision</label>
+                    <p name="decision" class="border rounded p-2">
+                        <span>@Model.BusinessHead.Decision</span>
+                    </p>
+                </div>
+                @if (Model.BusinessHead.Input != "")
+                {
+                    <div class="col-6 form-group">
+                        <label>Input</label>
+                        <pre name="decision" class="border rounded p-2">@Model.BusinessHead.Input</pre>
+                    </div>
+                }
+
+                <div class="col-6 form-group">
+                    <label>Target Date</label>
+                    <p class="border rounded p-2">
+                        <span>@convertDate(Model.BusinessHead.TargetDate)</span>
+                    </p>
+                </div>
+                @if (Model.BusinessHead.Remarks != "")
+                {
+                    <div class="col-6 form-group">
+                        <label>Remarks</label>
+                        <pre class="border rounded p-2">@Model.BusinessHead.Remarks</pre>
+                    </div>
+                }
+
+                @try
+                {
+                    List<QaAtt> siatt5 = Model.BusinessHead.Atts;
+
+
+                    <div class="col-12 form-group">
+                        <div class="row">
+                            <label class="col-6">Attachments</label><br>
+
+                            <div class="col-6 text-right">
+                                @if (Model.IsSuperAdmin)
+                                {
+                                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add_image_modal" type="button" onclick="$('#type_id').val('@Model.BusinessHead.FlowId'); $('#type').val('flow')">Add Image</button>
+                                }
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (siatt5 != null)
+                            {
+                                @for (int j = 0; j < siatt5.Count; j++)
+                                {
+                                    var images = siatt5[j].Data.Split("data:");
+                                    foreach (var image in images)
+                                    {
+                                        if (image == "")
+                                        {
+                                            continue;
+                                        }
+                                        var dataUrl = image;
+                                        if (image.EndsWith(","))
+                                        {
+                                            dataUrl = image.Substring(0, image.Length - 1);
+                                        }
+
+
+                                        <div class="col-md-2 col-sm-3 card text-center">
+                                            @if (image.StartsWith("image"))
+                                            {
+                                                <img class="card-img-top" style="height: 100px" src="data:@dataUrl" />
+                                            }
+                                            else
+                                            {
+                                                <i class="card-img-top fa-7x w-100 fa fa-file-pdf"></i>
+                                            }
+                                            <div class="card-body">
+
+                                                <button class=" btn-sm btn btn-primary w-100" onclick="openNewWindow('data:@dataUrl'); return false;">
+                                                    <i class="fa fa-eye"></i>View
+                                                </button>
+
+                                                <a href="data:@dataUrl" class="mt-1 w-100 btn-sm btn btn-primary" target="_blank" download><i class="fa fa-download"></i>Download</a>
+
+                                            </div>
+                                        </div>
+
+                                    }
+                                }
+                            }
+                        </div>
+
+
+                    </div>
+                }
+                catch { }
+
+
+                <div class="col-6 form-group">
+                    <label>Decision By</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.BusinessHead.DecisionBy?.Name</span>
+                    </p>
+                </div>
+
+                <div class="col-6 form-group">
+                    <label>Decision Date</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.BusinessHead.DecisionDate?.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

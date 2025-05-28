@@ -1,0 +1,195 @@
+﻿@model AssigneeCreateRequest
+@using DETP.Constant
+@using DETP;
+
+@{
+    var current_dt = ViewData["current_dt"] as CurrentFlow;
+}
+
+<div class="col-12 form-group">
+    <label for="observation_details">Observation Details</label>
+    <textarea type="text" class="form-control" asp-for="ObservationDetails" placeholder="Observation Details" required> </textarea>
+</div>
+<div class="col-12 form-group">
+    <label for="root_cause_analysis">Root Cause Analysis</label>
+    <textarea type="text" class="form-control" asp-for="RootCauseAnalysis" placeholder="Root Cause Analysis" required> </textarea>
+</div>
+<div class="col-12 form-group">
+    <label for="corrective_action">Corrective Action</label>
+    <textarea type="text" class="form-control" asp-for="CorrectiveAction" placeholder="Corrective Action" required> </textarea>
+</div>
+<div class="col-12 form-group">
+    <label for="preventive_action">Preventive Action</label>
+    <textarea type="text" class="form-control" asp-for="PreventiveAction" placeholder="Preventive Action" required> </textarea>
+</div>
+<div class="col-12 form-group">
+    <label for="value_of_rectification">Value of Rectification(in Rs.)</label>
+    <input type="number" class="form-control" asp-for="ValueOfRectification" placeholder="Value of Rectification (in Rs)" required>
+</div>
+<div class="col-12 form-group">
+    <label for="time_loss">Time Loss(in Number of days)</label>
+    <input type="number" class="form-control" asp-for="TimeLoss" placeholder="Time Loss(in Number of days)" required>
+</div>
+<div class="col-12 form-group">
+    <label for="time_value">Time Value(in Rs.)</label>
+    <input type="number" class="form-control" asp-for="TimeValue" placeholder="Time Value(in Rs.)" required>
+</div>
+<div class="col-12 form-group">
+    <label for="remarks">Attachments</label>
+    <input type="file" onchange="showImage(this)" class="form-control" id="fileInput" multiple>
+</div>
+<div class="col-12">
+    <div class="row" id="images">
+    </div>
+</div>
+<div class="col-12 form-group">
+    <label>Decision By</label>
+    <select name="decision_by" id="decision_by" class="form-control">
+        <option value="@current_dt.UserId">@current_dt.Name</option>
+    </select>
+</div>
+<div class="col-12 form-group">
+    @{
+        var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+    }
+    <label>Decision Date</label>
+
+    <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+</div>
+<script>
+    var img_array = [];
+    function getBase64(file) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+
+            img_array.push(reader.result);
+
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    $(function () {
+        img_array = [];
+        var files = document.getElementById('fileInput').files;
+        for (var i = 0; i < files.length; i++) {
+            if (files.length > 0) {
+
+                var ext = files[i].name.substr(-3);
+                if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                    getBase64(files[i]);
+                }
+
+
+            }
+        }
+        console.log(img_array);
+
+    });
+
+    $('#myform').validate({
+        rules: {
+            ObservationDetails: {
+                required: true
+            },
+            RootCauseAnalysis: {
+                required: true
+            },
+            CorrectiveAction: {
+                required: true
+            },
+            PreventiveAction: {
+                required: true
+            },
+            ValueOfRectification: {
+                required: true
+            },
+            TimeLoss: {
+                required: true
+            },
+            TimeValue: {
+                required: true
+            },
+            DecisionDate: {
+                required: true
+            }
+        },
+        messages: {
+            observation_details: {
+                required: "This field is required"
+            },
+            root_cause_analysis: {
+                required: "This field is required"
+            },
+            corrective_action: {
+                required: "This field is required"
+            },
+            preventive_action: {
+                required: "This field is required"
+            },
+            value_of_rectification: {
+                required: "This field is required"
+            },
+            time_loss: {
+                required: "This field is required"
+            },
+            time_value: {
+                required: "This field is required"
+            },
+            decision_date: {
+                required: "This field is required"
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            Submit(form);
+        }
+    });
+    function Submit(form) {
+        if ($('#myform').valid()) {
+            $('#modal-loader').modal('show')
+            $('#submit_request').prop('disabled', true)
+
+            var url = "@Url.Action("SaveAssignee", "QAFlow")"
+            imgs = [];
+            $('.image-upload').each(function () {
+                imgs.push($(this).data('src'));
+            });
+            let myData = new FormData(form);
+            myData.append("Att", imgs)
+            myData.append("UserId", '@current_dt.UserId')
+            myData.append("ToId", '@current_dt.SubmitTo')
+            myData.append("FromId", '@current_dt.FromId')
+            myData.append("ObservationId", '@current_dt.ObservationId')
+            myData.append("FlowId", '@current_dt.FlowId')
+            request(url, myData)
+                .then(response => {
+                    $('#modal-loader').modal('hide')
+                })
+                .catch((error) => {
+                    $('#modal-loader').modal('hide')
+                    if (error.status == 400) {
+                        let errors = error.responseJSON.reduce((acc, x) => {
+                            acc[x.propertyName] = x.errorMessage;
+                            return acc;
+                        }, {});
+                        console.log(errors)
+                        $('#myform').validate().showErrors(errors);
+                    }
+                });
+        }
+    }
+</script>

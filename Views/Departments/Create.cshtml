@@ -1,0 +1,44 @@
+﻿@model DETP.model.Department
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+
+@{
+    ViewData["Title"] = "Create Department";
+}
+<div class="card m-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Abbr" class="control-label"></label>
+                        <input asp-for="Abbr" class="form-control" />
+                        <span asp-validation-for="Abbr" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UpdatedOn" class="control-label"></label>
+                        <input asp-for="UpdatedOn" class="form-control" />
+                        <span asp-validation-for="UpdatedOn" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DivisionId" class="control-label"></label>
+                        <select asp-for="DivisionId" class="form-control" asp-items="ViewBag.DivisionName"></select>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>
+
+    </div>
+</div>

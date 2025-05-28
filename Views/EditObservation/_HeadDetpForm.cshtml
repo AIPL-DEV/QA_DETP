@@ -1,0 +1,226 @@
+﻿@model HeadDetpCreateRequest
+@using DETP.Constant;
+
+
+@{
+    CurrentFlow current_dt = ViewData["current_dt"] as CurrentFlow;
+    var itemlast = ViewData["itemlast"] as BaseModel;
+    int userId = current_dt.UserId;
+    string userName = current_dt.Name;
+}
+@if (current_dt.FromId != RoleConst.BUSINESS_HEAD && !(itemlast?.GetType() == typeof(QAOfficer) || itemlast?.GetType() == typeof(EicDetp)))
+{
+    <div class="col-12 form-group">
+        <label>Decision by Sectional Head QA</label>
+        <select asp-for="Decision" class="form-control">
+            @if ((ViewData["observation"] as QAObservation).Job == "Yes")
+            {
+                <option value="Accepted">forward for closure</option>
+                <option value="Need Clarification">Need Clarification</option>
+            }
+            else
+            {
+                <option value="Accepted">Accepted </option>
+                <option value="Convert">Convert</option>
+                <option value="Rejected">Rejected</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-12 form-group critical_fileds2" style="display:none">
+        <label>Type of Observation</label>
+        <select asp-for="Job" class="form-control">
+            <option value="Minor">Minor</option>
+            <option value="Major">Major</option>
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Remarks</label>
+        <textarea type="text" class="form-control" name="remarks" id="remarks" placeholder="Remarks" required></textarea> 
+        <input type="hidden" class="form-control" asp-for="Qaaa" value="no">
+    </div>
+
+
+
+    <script>
+        const rules = {
+            decision: {
+                required: true
+            },
+            remarks: {
+                required: true
+            },
+            decision_date: {
+                required: true
+            }
+        }
+    </script>
+}
+
+else if ((current_dt.FromId == RoleConst.BUSINESS_HEAD || itemlast?.GetType() == typeof(EicDetp)))
+{
+    <div class="col-12 form-group">
+        <label>Non Conformance Closed Satisfactory and Within SLG?</label>
+        <select name="decision" id="decision" class="form-control">
+
+            <option value="Need Clarification">Need Clarification</option>
+
+            <option value="Forward to QA">Forward for Closure</option>
+
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Remarks</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks" required>
+
+        </textarea> <input type="hidden" class="form-control" name="qaaa" id="qaaa" value="no">
+    </div>
+
+    <script>
+
+        const rules = {
+            decision: {
+                required: true
+            },
+            remarks: {
+                required: true
+            },
+            decision_date: {
+                required: true
+            }
+        }
+
+    </script>
+}
+else if (current_dt.FromId != RoleConst.BUSINESS_HEAD && itemlast?.GetType() == typeof(QAOfficer))
+{
+    <div class="col-12 form-group">
+        <label>Non Conformance Closed Satisfactory and Within SLG?</label>
+        <select asp-for="Decision" class="form-control">
+            <option value="Need Clarification">Need Clarification</option>
+            <option value="Forward to QA">Forward to HoD DETP</option>
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Remarks</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks" required> </textarea>
+        <input type="hidden" class="form-control" asp-for="Qaaa" value="yes" required>
+    </div>
+
+    <script>
+
+        const rules = {
+            decision: {
+                required: true
+            },
+            remarks: {
+                required: true
+            },
+            decision_date: {
+                required: true
+            }
+        }
+
+    </script>
+}
+
+<div class="col-12 form-group">
+    <label>Decision By</label>
+    <select name="decision_by" id="decision_by" class="form-control">
+        <option value="@current_dt.UserId">@current_dt.Name</option>
+    </select>
+</div>
+<div class="col-12 form-group">
+    @{
+        DateTime defaultDate = default(DateTime);
+
+        var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+    }
+    <label>Decision Date</label>
+
+    <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+</div>
+
+
+<script>
+
+        $('#Decision').on('change', function () {
+            if (this.value == "Accepted") {
+                $('.critical_fileds').css('display', 'block');
+                $('.critical_fileds2').css('display', 'none');
+
+            } else if (this.value == "Convert") {
+                $('.critical_fileds').css('display', 'none');
+                $('.critical_fileds2').css('display', 'block');
+
+            }
+            else {
+                $('.critical_fileds').css('display', 'none');
+                $('.critical_fileds2').css('display', 'none');
+
+            }
+        });
+
+    $('#myform').validate({
+        rules: rules,
+        messages: {
+            decision_date: {
+                required: "This field is required"
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler(form) {
+            Submit(form)
+        }
+    });
+    function Submit(form) {
+        if ($('#myform').valid()) {
+            $('#modal-loader').modal('show')
+            $('#submit_request').prop('disabled', true)
+
+            var values = {
+                decision: $('#decision').val(),
+                job: $("[name=job]:checked").val(),
+                obv: $('#obv').val(),
+                remarks: $('#remarks').val(),
+                qaaa: $('#qaaa').val(),
+                decision_by: $('#decision_by').val(),
+                decision_date: $('#decision_date').val()
+            }
+            var url = "@Url.Action("SaveHeadDetp", "QAFlow")"
+
+            var myData = new FormData(form);
+            myData.append("Decision", '')
+            myData.append("ToId", '@current_dt.SubmitTo')
+            myData.append("FromId", '@current_dt.FromId')
+            myData.append("ObservationId", '@current_dt.ObservationId')
+            myData.append("FlowId", '@current_dt.FlowId')
+            request(url, myData)
+                .then(response => {
+                    $('#modal-loader').modal('hide')
+                })
+                .catch((error) => {
+                    $('#modal-loader').modal('hide')
+                    if (error.status == 400) {
+                        let errors = error.responseJSON.reduce((acc, x) => {
+                            acc[x.propertyName] = x.errorMessage;
+                            return acc;
+                        }, {});
+
+                        $('#myform').validate().showErrors(errors);
+                    }
+                });
+        }
+    }
+</script>

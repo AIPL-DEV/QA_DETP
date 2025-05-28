@@ -1,0 +1,136 @@
+﻿@model Tuple<DataTable>
+@using System.Data;
+
+@section Head {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/basic.min.css" integrity="sha512-MeagJSJBgWB9n+Sggsr/vKMRFJWs+OUphiDV7TJiYu+TNQD9RtVJaPDYP8hA/PAjwRnkdvU+NsTncYTKlltgiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+}
+
+<section class="content">
+    <!-- request -->
+
+    <div class="container-fluid">
+        @{
+            DateTime defaultDate = default(DateTime);
+
+            var userDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+        <div class="card">
+            <!-- form start -->
+            <form role="form" id="myform" enctype="multipart/form-data">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="date">Request Date</label>
+                        <input type="text" value="@userDt" class="form-control" id="date" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select name="department" id="department" class="form-control">
+                            @for (int i = 0; i < Model.Item1.Rows.Count; i++)
+                            {
+                                <option value="@Model.Item1.Rows[i].ItemArray[0].ToString()">@Model.Item1.Rows[i].ItemArray[1].ToString()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="name_of_structure">Name of Structure</label>
+                        <input type="text" class="form-control" name="name_of_structure" id="name_of_structure" placeholder="Name of Structure">
+                    </div>
+                    <div class="form-group">
+                        <label for="cost_center">Cost Center</label>
+                        <input type="number" class="form-control" name="cost_center" id="cost_center" placeholder="Cost Center">
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select name="priority" id="priority" class="form-control">
+                            <option>L</option>
+                            <option>M</option>
+                            <option>H</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_person_name">Contact Person Name</label>
+                        <input type="text" class="form-control" name="contact_person_name" id="contact_person_name" placeholder="Contact Person Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_person_email">Contact Person Email</label>
+                        <input type="email" class="form-control" name="contact_person_email" id="contact_person_email" placeholder="Contact Person Email">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_person_phone">Contact Person Phone</label>
+                        <input type="tel" class="form-control" name="contact_person_phone" id="contact_person_phone" placeholder="Contact Person Phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="location" id="location" class="form-control">
+
+                    </div>
+                    <div class="form-group">
+                        <label>Structure Type</label>
+                        <select name="structure_type" id="structure_type" class="form-control">
+                            <option>Quarter and Bunglow Flats</option>
+                            <option>Flats</option>
+                            <option>Hospital/Dispensary</option>
+                            <option>Stadium</option>
+                            <option>Office/Commercial (RCC/Masonry)</option>
+                            <option>Industrial (RCC/Masonry)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="number_of_structure">Number of Structure</label>
+                        <input type="number" class="form-control" name="number_of_structure" id="number_of_structure" placeholder="Number of Structure">
+
+                        <input type="hidden" name="actionurl" id="actionurl" value="@Url.Action("Index", "Home")">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Brief Description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Attachment</label>
+                        <input type="file" name="file" id="file" class="form-control" multiple/>
+                    </div>
+
+                </div>
+
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button id="submit_sha_request" type="button" class="btn btn-primary float-right" onclick="SubmitRequest()" data-request-url="@Url.Action("Submit", "SHARequest")">Submit</button>
+                </div>
+            </form>
+        </div>
+
+    </div><!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please Wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Request Generated Successfully!<br /><br />Your Job Request Number is</p>
+                    <b><p class="text-center" id="job_request_no"></p></b><br /><br /><center>Please be patient you are being redirected...</center>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+<script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="~/dist/js/request.js?v=4"></script>
+

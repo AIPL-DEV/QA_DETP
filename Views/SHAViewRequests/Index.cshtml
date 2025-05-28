@@ -1,0 +1,129 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Data;
+@model Tuple<DataTable, DataTable>
+<section class="content">
+    <!-- job -->
+
+    <div class="container-fluid">
+        <div class="">
+            <div class="card card-primary card-outline card-outline-tabs">
+                <div class="card-header p-0 border-bottom-0">
+                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                        @{ String show="active"; }
+                        @if (Context.Session.GetString("role_name").Equals("Customer") || Context.Session.GetString("role_name").Equals("Super Admin") || Context.Session.GetString("role_name").Equals("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">My Requests</a>
+                            </li>
+                            if (Context.Session.GetString("role_name").Equals("Super Admin"))
+                            {
+                                show = "";
+                            }
+                        }
+                        @if (Context.Session.GetString("role_name").Equals("SHA Team") || Context.Session.GetString("role_name").Equals("Super Admin") || Context.Session.GetString("role_name").Equals("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @show" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">Pending Requests</a>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+                <div class="card-body">
+       
+  
+                    <div class="tab-content" id="custom-tabs-four-tabContent">
+@if (Context.Session.GetString("role_name").Equals("Customer") || Context.Session.GetString("role_name").Equals("Super Admin") || Context.Session.GetString("role_name").Equals("Admin"))
+{
+                        <div class="table-responsive tab-pane fade show active" id="custom-tabs-four-home" role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+                            <table id="example1" class="table table-hover text-nowrap">
+                                <thead>
+                                    @if (Model.Item1 != null && Model.Item1.Columns[0].ColumnName.Equals("id"))
+                                    {
+                                        <tr>
+
+                                            @for (int i = 0; i < Model.Item1.Columns.Count; i++)
+                                            {
+                                                <th>
+                                                    @Model.Item1.Columns[i].ColumnName.Replace("_", " ").ToString()
+                                                </th>
+                                            }
+                                            <th>
+                                                Action
+                                            </th>
+                                        </tr>
+                                    }
+                                </thead>
+                                <tbody>
+                                    @if (Model.Item1 != null && Model.Item1.Columns[0].ColumnName.Equals("id"))
+                                    {
+                                        @for (int i = 0; i < Model.Item1.Rows.Count; i++)
+                                        {
+                                            <tr onclick="window.location.href = '@Url.Action("index", "EditSHARequest", new { serial_no = @Model.Item1.Rows[i].ItemArray[0].ToString() })';">
+                                                @for (int j = 0; j < Model.Item1.Columns.Count; j++)
+                                                {
+                                                    <td>
+                                                        @Model.Item1.Rows[i].ItemArray[j].ToString()
+                                                    </td>
+                                                }
+                                                <td>
+
+                                                    <button id="submit_request" type="button" class="btn btn-primary float-right" onclick="window.location.href = '@Url.Action("index", "EditSHARequest", new { serial_no = @Model.Item1.Rows[i].ItemArray[0].ToString() })';">View</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                       }
+                        @if (Context.Session.GetString("role_name").Equals("SHA Team") || Context.Session.GetString("role_name").Equals("Super Admin") || Context.Session.GetString("role_name").Equals("Admin"))
+                        {
+                        <div class="table-responsive tab-pane fade show @show" id="custom-tabs-four-profile" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
+                            <table id="example2" class="table table-hover text-nowrap">
+                                <thead>
+                                    @if (Model.Item2 != null && Model.Item2.Columns[0].ColumnName.Equals("id"))
+                                    {
+                                        <tr>
+                                            @for (int i = 0; i < Model.Item2.Columns.Count; i++)
+                                            {
+                                                <th>
+                                                    @Model.Item2.Columns[i].ColumnName.Replace("_", " ").ToString()
+                                                </th>
+                                            }
+                                            <th>
+                                                Action
+                                            </th>
+                                        </tr>
+                                    }
+                                </thead>
+                                <tbody>
+                                    @if (Model.Item2 != null && Model.Item2.Columns[0].ColumnName.Equals("id"))
+                                    {
+                                        @for (int i = 0; i < Model.Item2.Rows.Count; i++)
+                                        {
+                                            <tr onclick="window.location.href = '@Url.Action("index","EditSHARequest", new { serial_no = @Model.Item2.Rows[i].ItemArray[0].ToString()})';">
+                                                @for (int j = 0; j < Model.Item2.Columns.Count; j++)
+                                                {
+                                                    <td>
+                                                        @Model.Item2.Rows[i].ItemArray[j].ToString()
+                                                    </td>
+                                                }
+                                                <td>
+                                                    <button id="submit_request" type="button" class="btn btn-primary float-right" onclick="window.location.href = '@Url.Action("index","EditSHARequest", new { serial_no = @Model.Item2.Rows[i].ItemArray[0].ToString()})';">View</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        }
+                        
+                    </div>
+                        </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>

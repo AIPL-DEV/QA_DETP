@@ -1,0 +1,106 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+<section class="content">
+    <!-- job -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+                <div class="card-header">
+                    <button id="add_user" type="button" class="btn btn-primary float-right" onclick="location.href='@Url.Action("index","AddDepartment")';">Add Department</button>
+                </div>
+
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap" id="example1">
+                        <thead>
+                            <tr>
+                                <th>Department Abbreviation</th>
+                                <th>Department Name</th>
+                                <th></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @for (int i = 0; i < Model.Rows.Count; i++)
+                            {
+                                <tr>
+                                    <td>@Model.Rows[i].ItemArray[1].ToString()</td>
+                                    <td>@Model.Rows[i].ItemArray[2].ToString()</td>
+                                    <td>
+                                        <button id="edit-btn" type="button" class="btn btn-sm btn-primary" onclick="Update(@Model.Rows[i].ItemArray[0].ToString())" data-request-url="@Url.Action("Update", "Department")">Edit</button>
+                                        <button id="submit_request" type="button" class="btn btn-sm btn-danger" onclick="Delete(@Model.Rows[i].ItemArray[0].ToString())" data-request-url="@Url.Action("Delete", "Department")">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+    <!-- /.row -->
+</section>
+<!-- modal-->
+<div class="modal" id="modal-loader">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                <p class="text-center">Please wait</p>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- modal-->
+<div class="modal fade" id="modal-success">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                <p class="text-center">Department deleted successfully</p>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="modal-success2">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                <p class="text-center">Department edited successfully</p>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="modal-edit">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="col-6"><label>Abbreviation</label></div><div class="col-12"><input type="text" class="form-control" name="abb" id="abb" /></div>
+                <div class="col-6"><label>Name</label></div><div class="col-12"><input type="text" class="form-control" name="name" id="name" /><input type="hidden" class="form-control" name="id" id="id" /></div>
+                <br>
+                <center>
+                    <button id="submit_request2" type="button" class="btn btn-sm btn-primary" onclick="DoUpdate()" data-request-url="@Url.Action("DoUpdate", "Department")">Update</button>
+                </center>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<script src="~/dist/js/adddepartment.js"></script>

@@ -1,0 +1,158 @@
+﻿@model Tuple<DataTable, DataTable, DataTable, Tuple<DataTable>>
+
+@using System.Data;
+<section class="content">
+    <!-- job -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+                <div class="card-header">
+                    <button id="add_user" type="button" class="btn btn-primary float-right" onclick="location.href='@Url.Action("index","AddUser")';">Add User</button>
+                </div>
+
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap" id="example1">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>P.No.</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>App</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @for (int i = 0; i < Model.Item1.Rows.Count; i++)
+                            {
+                                <tr>
+                                    <td>@(i + 1) </td>
+                                    <td>@Model.Item1.Rows[i].ItemArray[1].ToString()</td>
+                                    <td>@Model.Item1.Rows[i].ItemArray[2].ToString()</td>
+                                    <td>@Model.Item1.Rows[i].ItemArray[3].ToString()</td>
+                                    <td>
+                                        @{
+                                            if (Model.Item1.Rows[i].ItemArray[4].ToString().Contains("EIC"))
+                                            {
+                                                <span>HoD DETP</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@Model.Item1.Rows[i].ItemArray[4].ToString()</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@Model.Item1.Rows[i].ItemArray[5].ToString()</td>
+                                    <td>@Model.Item1.Rows[i].ItemArray[6].ToString()</td>
+                                    <td>
+                                        <button id="edit-user" type="button" class="btn btn-sm btn-primary" onclick="Update(@Model.Item1.Rows[i].ItemArray[0].ToString())" data-request-url="@Url.Action("Update", "User")">Edit</button>
+
+                                        <button id="delete-user" type="button" class="btn btn-sm btn-danger" onclick="Submit(@Model.Item1.Rows[i].ItemArray[0].ToString())" data-request-url="@Url.Action("Delete", "User")">Delete</button>
+                                        <button id="resetbtn" type="button" class="btn btn-sm btn-info" onclick="ResetPwd(@Model.Item1.Rows[i].ItemArray[0].ToString())" data-request-url="@Url.Action("ResetPwd", "User")">Reset Password</button>
+
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+    <!-- /.row -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">User deleted successfully</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modal-success2">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Password has been sent to user's email id successfully</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modal-success3">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">User edited successfully</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <div class="modal fade" id="modal-edit">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="col-6"><label>PNo</label></div><div class="col-12"><input type="text" class="form-control" name="pno" id="pno" /></div>
+                    <div class="col-6"><label>Name</label></div><div class="col-12"><input type="text" class="form-control" name="name" id="name" /></div>
+                    <div class="col-6"><label>Email</label></div><div class="col-12"><input type="text" class="form-control" name="email" id="email" /></div>
+                    <div class="col-6"><label>Department</label></div><div class="col-12">
+                        <select name="dept" id="dept" class="form-control">
+                            @for (int i = 0; i < Model.Item2.Rows.Count; i++)
+                            {
+                                <option value="@Model.Item2.Rows[i].ItemArray[0].ToString()">@Model.Item2.Rows[i].ItemArray[1].ToString()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-6"><label>Role</label></div><div class="col-12">
+                        <select name="role" id="role" class="form-control">
+                            @for (int i = 0; i < Model.Item3.Rows.Count; i++)
+                            {
+                                <option value="@Model.Item3.Rows[i].ItemArray[0].ToString()">@(Model.Item3.Rows[i].ItemArray[1].ToString().Contains("EIC") ? "HoD DETP" : Model.Item3.Rows[i].ItemArray[1].ToString())</option>
+                            }
+                        </select><input type="hidden" class="form-control" name="id" id="id" />
+                    </div>
+                    <br>
+                    <center>
+                        <button id="submit_request3" type="button" class="btn btn-sm btn-primary" onclick="DoUpdate()" data-request-url="@Url.Action("DoUpdate", "User")">Update</button>
+                    </center>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</section>
+<script src="~/dist/js/user.js"></script>

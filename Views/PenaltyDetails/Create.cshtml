@@ -1,0 +1,50 @@
+﻿@model DETP.model.QaViolation.PenaltyDetail
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FinancialPenalty" class="control-label"></label>
+                <input asp-for="FinancialPenalty" class="form-control" />
+                <span asp-validation-for="FinancialPenalty" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Administrative" class="control-label"></label>
+                <input asp-for="Administrative" class="form-control" />
+                <span asp-validation-for="Administrative" class="text-danger"></span>
+            </div>
+             <div class="form-group">
+                            <label asp-for="Max_amount" class="control-label"></label>
+                            <input asp-for="Max_amount" class="form-control" />
+                            <span asp-validation-for="Max_amount" class="text-danger"></span>
+             </div>
+            <div class="form-group">
+                <label asp-for="QaViolationCategoryId" class="control-label"></label>
+                <select asp-for="QaViolationCategoryId" class ="form-control" asp-items="ViewBag.QaViolationCategoryId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="QaViolationSubCategoryId" class="control-label"></label>
+                <select asp-for="QaViolationSubCategoryId" class ="form-control" asp-items="ViewBag.QaViolationSubCategoryId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

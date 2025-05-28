@@ -1,0 +1,46 @@
+﻿
+@{
+    var url = "";
+    if (ViewBag.col != null)
+    {
+        url = "&column=" + ViewBag.col + "&query=" + ViewBag.query;
+    }
+}
+
+
+<div class="row">
+    <div class="col-sm-12 col-md-12">
+        <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">Showing @ViewBag.from to @ViewBag.to of @ViewBag.total entries</div>
+    </div>
+    <div class="col-sm-12 col-md-7">
+        <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+            <ul class="pagination">
+
+                <li class="paginate_button page-item previous @(ViewBag.prev == 0 ? "disabled" : "")" id="dataTable_previous">
+                    <a href="?page=@(ViewBag.prev + url )" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
+                </li>
+                <li>
+                    <select class="form-control" style="width: 100px;" onchange="openUrl(this)">
+                        @for (var i = 0; i < ViewBag.totalPage - 1; i++)
+                        {
+
+                            var pages = i + 1;
+                            var fullUrl = pages + url;
+
+                            @* <option @(ViewBag.page == (i + 1) ? "selected" : "")>@(i+1)</option> *@
+                        }
+                    </select>
+                </li>
+                <li class="paginate_button page-item previous @ViewBag.nextDisable" id="dataTable_previous">
+                    <a href="?page=@(ViewBag.next + url )" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Next</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+<script>
+    function openUrl(el) {
+        window.location.href = '?page=' + el.value + '@Html.Raw(url)';
+    }
+</script>

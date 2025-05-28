@@ -1,0 +1,55 @@
+﻿@model EicDetpCardModel
+
+
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#head-detp-@Model.Index">
+                @if (!Model.IsHoDDETP)
+                {
+                    <span>EIC DETP</span>
+                }
+                else
+                {
+                    <span>HoD DETP</span>
+                }
+            </a>
+        </h4>
+    </div>
+    <div id="head-detp-@Model.Index" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-6 form-group">
+                    <label>Decision</label>
+                    <p name="decision" class="border rounded p-2">
+                        <span>@Model.EicDetp.Decision</span>
+                    </p>
+                </div>
+
+                @if (Model.EicDetp.Remarks != "")
+                {
+                    <div class="col-6 form-group">
+                        <label>Remarks</label>
+                        <pre name="remarks" class="border rounded p-2">@Model.EicDetp.Remarks</pre>
+                    </div>
+                }
+                <div class="col-6 form-group">
+                    <label>Decision By</label>
+                    <p name="decision_by" class="border rounded p-2">
+                        <span>@Model.EicDetp.DecisionBy?.Name</span>
+                    </p>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Decision Date</label>
+                    <p name="decision_date" class="border rounded p-2">
+                        <span>@Model.EicDetp.DecisionDate?.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+
+                <!-- /.form group -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+﻿@model DETP.model.Department
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+
+@{
+    ViewData["Title"] = "Department Details";
+}
+
+<div class="card m-3">
+    <div class="card-body">
+
+    
+    
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Abbr)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Abbr)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UpdatedOn)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UpdatedOn)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Division)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Division.id)
+        </dd>
+    </dl>
+
+<div>
+    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+    </div>
+</div>

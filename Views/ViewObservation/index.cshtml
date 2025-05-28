@@ -1,0 +1,293 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Data;
+@using System.Globalization
+@using System.ComponentModel.DataAnnotations.Schema
+@using DETP;
+@using DETP.model;
+@model List<DETP.model.QAObservation>
+@{
+    String a = "active";
+    List<Department> departments = ViewBag.viewDepartments;
+    List<Division> divisions = ViewBag.viewDivisions;
+}
+@{
+    String b = "show active";
+    string column = "";
+}
+
+<section class="content">
+    <!-- job -->
+
+    <div class="container-fluid">
+
+        <form autocomplete="off" id="search-form">
+            <div class="card p-0">
+                <div class="card-body p-2">
+
+                    <div class="row position-relative">
+                        <div class="form-group col-sm-3">
+                            <label for="column-name">Search By</label>
+                            <select class="form-control text-uppercase" name="column" id="column-name" onchange="FindSelectChanged(this);">
+                                @foreach (string attr in ViewBag.Columns)
+                                {
+                                    if (attr.Trim() == "site_incharge" || attr.Trim() == "observation_by")
+                                    {
+                                        continue;
+                                    }
+                                    <option class="text-uppercase" value="@attr.Trim()" selected="@(attr == (string)TempData["column"] ? "selected" : false)">
+                                        @attr.Replace("_", " ")
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-6">
+                            <label for="query">Search Terms</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="text" name="query" class="form-control" id="query" autocomplete="off" value="@TempData["query"]" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <button class="btn btn-dark">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                
+            </div>
+            @if (divisions?.Count > 0 || departments?.Count > 0)
+            {
+                <div class="alert alert-info" role="alert">
+                    <div class="d-flex justify-content-between">
+                    <div>
+                    @if (departments?.Count > 0)
+                    {
+                        <div>
+                            <span class="text-bold">Division: </span>@foreach (Division div in divisions)
+                            {
+                                <span>@div.name </span>
+                            }
+                        </div>
+                    }
+
+                    @if (departments?.Count > 0)
+                    {
+                        <div>
+                            <span class="text-bold">Department: </span>@foreach (Department dept in departments)
+                            {
+                                <span>@dept.Name, </span>
+                            }
+                        </div>
+                    }
+                 </div>
+
+                        <button type="button" onclick="clearDivDept()" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                    </div>
+            </div>
+            }
+            <div class="card card-primary card-outline card-outline-tabs">
+                <div class="card-header p-0 border-bottom-0">
+                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                        @{
+                            a = "";
+                            b = "";
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">All Observations</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @a" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">Observations for Me</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="custom-tabs-four-tabContent">
+
+                        <div class="table-responsive tab-pane fade show active" id="custom-tabs-four-home" role="tabpanel" aria-labelledby="custom-tabs-four-home-tab" style="height: 500px; overflow-y: auto;">
+                            <table class="table table-hover text-nowrap" id="all-observations">
+                                <thead>
+                                    
+                                    <tr>
+                                        @foreach (string attr in ViewBag.Columns)
+                                        {
+                                            <th>
+                                                @attr.Replace("_", " ").ToString()
+                                            </th>
+                                        }
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+
+                                </thead>
+                                
+                            </table>
+                        </div>
+
+                        <div class="table-responsive tab-pane fade @b" id="custom-tabs-four-profile" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
+                            <table id="my-observation" class="table table-hover text-nowrap">
+                                <thead>
+                                    
+                                    <tr>
+                                        @foreach (string attr in ViewBag.Columns)
+                                        {
+                                            <th>
+                                                @attr.Replace("_", " ").ToString()
+                                            </th>
+                                        }
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+        </form>
+    </div><!-- /.container-fluid -->
+</section>
+<script>
+    var table, table1;
+    var divs, dept;
+    function FindSelectChanged(el) {
+        if (el.value == "logged_date") {
+
+            $('#query').attr('type', "date");
+        }
+        else {
+            $('#query').attr('type', "text");
+        }
+    }
+
+    function redraw() {
+        table.ajax.reload();
+        table1.ajax.reload();
+    }
+
+    
+
+    function clearDivDept(){
+        divs = null;
+        dept = null;
+        redraw();
+    }
+
+    $(document).ready(function () {
+        dept = '@(TempData["departmentIds"])';
+        divs = '@(TempData["divisionIds"])';
+        const baseUrl = window.location.href;
+        if (baseUrl.endsWith("#custom-tabs-four-profile")) {
+            $('#custom-tabs-four-tab a[href="#custom-tabs-four-profile"]').tab('show')
+        }
+
+        table = loadDatatable('#all-observations', "@Url.Action("List")");
+        $('#all-observations').on('click', 'tbody tr', function () {
+            var data = table.row(this).data();
+            window.location.href = `@Url.Action("index", "EditObservation")?serial_no=${data.serialNo}`
+        })
+
+        table1 = loadDatatable('#my-observation', "@Url.Action("List")?observationByMe=true");
+        $('#my-observation').on('click', 'tbody tr', function () {
+            var data = table1.row(this).data();
+            window.location.href = `@Url.Action("index", "EditObservation")?serial_no=${data.serialNo}`
+        })
+
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+            redraw();
+        });
+    });
+
+    function loadDatatable(id, url, removeDeptDiv) {
+        return $(id).DataTable({
+            "scrollX": true,
+            processing: true,
+            serverSide: true,
+            order: [[0, 'desc']],
+            initComplete: function () {
+                $(this.api().table().container()).find('input[type="search"]').parent().wrap('<form onsubmit="false">').parent().attr('autocomplete', 'off').css('overflow', 'hidden').css('margin', 'auto');
+
+            },
+            ajax: {
+                url: url,
+                type: "POST",
+
+                data: function (d) {
+                    d.fieldName = $('#column-name').val();
+                    d.fieldValue = $('#query').val();
+
+                    if (dept)
+                        d.departmentIds = dept
+                    if (divs) {
+                        d.divisionIds = divs;
+                    }
+                }
+            },
+            columns: [
+                { data: "serialNo", name: 'SerialNo' },
+                { data: "visitNo", name: 'VisitNo' },
+                { data: "loggedDate", name: 'LoggedDate' },
+                { data: 'division', name: 'Division' },
+                { data: 'dept.abbr', name: 'Department' },
+                { data: 'status', name: 'Status' },
+                { data: 'site', name: 'Site' },
+                { data: 'location', name: 'Location' },
+                { data: 'natureOfWork', name: 'NatureOfWork' },
+                { data: 'typeOfObservation', name: 'TypeOfObservation' },
+                { data: 'typeOfConfirmance', name: 'TypeOfConfirmance' },
+                { data: 'natureOfConfirmance', name: 'NatureOfConfirmance' },
+                { data: 'standard', name: 'Standard' },
+                { data: 'basics', name: 'Basics' },
+                { data: 'vendorCode', name: 'VendorCode' },
+                { data: 'vendorName', name: 'VendorName' },
+                { name: 'Action' }
+            ],
+            "columnDefs": [
+                { "render": (data, type, row) => data == "undefined" ? "" : data, "targets": [1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "defaultContent": "" },
+                { "render": createDivision, "data": null, "targets": [3], "defaultContent": "" },
+                { "render": createStatus, "data": null, "targets": [5], "defaultContent": "" },
+                { "render": createViewBtn, "data": null, "targets": [16], "orderable": false }
+            ],
+        })
+    }
+
+    function createStatus(data, type, row) {
+        data = data.replace("Head DETP", "Sectional Head QA");
+        data = data.replace("With EIC DETP", "With HoD DETP");
+        data = data.replace("EIC DETP", "HoD DETP");
+        data = data.replace("EIC DETP", "HoD DETP");
+        data = data.replace("EIC DETP", "HoD DETP");
+        data = data.replace("EIC DETP", "HoD DETP");
+        return data.replace("Closed by EIC DETP", "Closed");
+    }
+
+    function createDivision(division, type, row) {
+        return row?.division?.name
+    }
+
+    function createViewBtn(data, type, row) {
+        return `<button id="submit_request" type="button" class="btn btn-primary float-right" onclick="window.location.href = '@Url.Action("index", "EditObservation")?serial_no=${row.serialNo}'">View</button>`;
+    }
+
+    function replaceStatus(status)
+    {
+        status = status.toLower();
+        status = status.replace("secional head qa", "Head DETP");
+        status = status.replace("with hod detp", "With EIC DETP");
+        return status.replace("closed", "Closed by EIC DETP");
+    }
+
+</script>

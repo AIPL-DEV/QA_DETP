@@ -1,0 +1,106 @@
+﻿@model Tuple<DataTable, DataTable>
+@using System.Data
+@using Microsoft.AspNetCore.Http 
+<section class="content">
+
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <form role="form" id="myform">
+                <!-- form start -->
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label for="personal_number">Personal Number</label>
+                            <input type="text" class="form-control" name="personal_number" id="personal_number" placeholder="Personal Number">
+                        </div>
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Full Name">
+                        </div>
+
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+                        </div>
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label>Department</label>
+                            <select name="department" id="department" class="form-control">
+                                @for (int i = 0; i < Model.Item1.Rows.Count; i++)
+                                {
+                                    <option value="@Model.Item1.Rows[i].ItemArray[0].ToString()">@Model.Item1.Rows[i].ItemArray[1].ToString()</option>
+                                }
+                            </select>
+                        </div>
+                        @{ var role_name = Context.Session.GetString("role_name");
+                            var app_name = Context.Session.GetString("app_name");
+                        }
+                        <div class="col-12 col-sm-6 form-group">
+                            <label>App</label>
+                            <select id="app" name="app" class="form-control" required>
+                                <option value="">Select</option>
+                                @if (role_name == "Super Admin")
+                                {
+
+                                    <option value="SHA">SHA</option>
+                                    <option value="Design">Design</option>
+                                    <option value="QA">QA</option>
+                                }
+                                else
+                                {
+                                    <option value="@app_name">@app_name</option>
+
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6 form-group">
+                            <label>Role</label>
+                            <select name="role" id="role" class="form-control" required>
+                            </select>
+                        </div>
+                        <!-- /.form group -->
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="submit_request" type="submit" class="btn btn-primary float-right" onclick="Submit()" data-request-url="@Url.Action("Submit", "AddUser")">Add</button>
+                </div>
+            </form>
+        </div>
+
+    </div><!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">User created successfully</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+<script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="~/dist/js/adduser.js"></script>

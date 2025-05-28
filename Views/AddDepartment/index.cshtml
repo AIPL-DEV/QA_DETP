@@ -1,0 +1,76 @@
+﻿@model Tuple<DataTable, DataTable>
+@using System.Data
+@using DETP.model
+<section class="content">
+
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <form role="form" id="myform" method="get" action="@Url.Action("Submit")">
+                <!-- form start -->
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label for="division_id">Division</label>
+                            <select name="division_id" id="division_id" class="form-control">
+                                
+                                @foreach (Division division in ViewBag.divisions)
+                                {
+                                    <option value="@division.id">@division.name</option>                   
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label for="department_abbr">Department Abbreviation</label>
+                            <input type="text" class="form-control" name="department_abbr" id="department_abbr" placeholder="Department Abbreviation">
+                        </div>
+
+                        <div class="col-12 col-sm-6 form-group">
+                            <label for="department_name">Department Name</label>
+                            <input type="text" class="form-control" name="department_name" id="department_name" placeholder="Department Name">
+                        </div>
+
+                        <!-- /.form group -->
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="submit_request" type="submit" class="btn btn-primary float-right" onclick="Submit()" data-request-url="@Url.Action("Submit", "AddDepartment")">Add</button>
+                </div>
+            </form>
+        </div>
+
+    </div><!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Department added successfully</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+<script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="~/dist/js/adddepartment.js"></script>

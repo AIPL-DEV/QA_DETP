@@ -1,0 +1,69 @@
+﻿@model IEnumerable<DETP.model.QaViolation.PenaltyDetail>
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+
+
+			<div class="d-flex justify-content-end">
+				<a class="btn btn-primary" asp-action="Create">Create New</a>
+			</div>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th>
+							@Html.DisplayNameFor(model => model.FinancialPenalty)
+						</th>
+						<th>
+							@Html.DisplayNameFor(model => model.Administrative)
+						</th>
+						<th>
+							@Html.DisplayNameFor(model => model.Category)
+						</th>
+						<th>
+							@Html.DisplayNameFor(model => model.SubCategory)
+						</th>
+						<th>
+							@Html.DisplayNameFor(model => model.Max_amount)
+						</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								@Html.DisplayFor(modelItem => item.FinancialPenalty)
+							</td>
+							<td>
+								@Html.DisplayFor(modelItem => item.Administrative)
+							</td>
+							<td>
+								@Html.DisplayFor(modelItem => item.Category.Name)
+							</td>
+							<td>
+								@Html.DisplayFor(modelItem => item.SubCategory.Name)
+							</td>
+							<td>
+								@(item.Max_amount.HasValue && item.Max_amount > 0 ? item.Max_amount.ToString() : "0")
+
+							</td>
+							<td>
+								<a class="btn btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+								<a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+
+
+		</div>
+	</div>
+</div>

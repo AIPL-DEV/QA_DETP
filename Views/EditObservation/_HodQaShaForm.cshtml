@@ -1,0 +1,163 @@
+﻿@model HodQaShaCreateRequest
+@using DETP.Constant
+
+@{
+    var current_dt = ViewData["current_dt"] as CurrentFlow;
+    var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+
+}
+
+@if (current_dt.JobStopped)
+{
+
+    <div class="col-12 form-group">
+        <label>Non Conformance Closed Satisfactory and Within SLG?</label>
+        <select asp-for="Decision" class="form-control">
+            <option value="Not Satisfied">Send To Department Head</option>
+            <option value="Close">Close</option>
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">HoD QA & SHA Input</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks"></textarea>
+    </div>
+    
+}
+
+else
+{
+    <div class="col-12 form-group">
+        <label>Non Conformance Closed Satisfactory and Within SLG?</label>
+        <div class="col-12">
+
+            <label class="form-check-label" for="decision">
+                <input class="form-check-input" value="Not Satisfied" type="radio" asp-for="Decision" id="flexRadioDefault1" />
+
+                Need Clarification
+            </label>
+            <label class="form-check-label ml-4" for="flexRadioDefault2">
+                <input class="form-check-input " value="Close" type="radio" asp-for="Decision" id="flexRadioDefault2" />
+                Accept
+            </label>
+            <label class="form-check-label ml-4" for="flexRadioDefault2">
+                <input class="form-check-input " value="Return QA" type="radio" asp-for="Decision" id="flexRadioDefault2" />
+                Return QA
+            </label>
+        </div>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks"> HoD QA & SHA Input</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks"> </textarea>
+    </div>
+}
+<div class="col-12 form-group">
+    <label>Decision By</label>
+    <select name="decision_by" id="decision_by" class="form-control">
+        <option value="@current_dt.UserId">@current_dt.Name</option>
+    </select>
+</div>
+<div class="col-12 form-group">
+    <label>Decision Date</label>
+
+    <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+</div>
+<script>
+    var img_array = [];
+    function getBase64(file) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+
+            img_array.push(reader.result);
+
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    $(function () {
+        img_array = [];
+        var files = document.getElementById('fileInput')?.files;
+        if (files) {
+            for (var i = 0; i < files.length; i++) {
+                if (files.length > 0) {
+
+                    var ext = files[i].name.substr(-3);
+                    if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "pdf" || ext == "doc" || ext == "docx" || ext == "xls" || ext == "xlsx" || ext == "ppt" || ext == "pptx") {
+                        getBase64(files[i]);
+                    }
+                }
+            }
+        }
+    });
+
+    $('#myform').validate({
+        rules: {
+            // valuerec: {
+            //     required: true
+            // },
+        },
+        messages: {
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+            console.log(error)
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler(form) {
+            console.log(form)
+            Submit(form)
+        }
+    });
+    function Submit(form) {
+        
+        if ($('#myform').valid()) {
+            if (document.querySelector("input[name='Decision']")) {
+                if ($("input[name='Decision']:checked").length == 0) {
+                    $("input[name='Decision']").parent().parent().addClass('is-invalid');
+                    return;
+                }
+            }
+            else {
+                $('#modal-loader').modal('show')
+                $('#submit_request').prop('disabled', true)
+                var url = "@Url.Action("SaveHodQaSha", "QAFlow")"
+                imgs = [];
+                $('.image-upload').each(function () {
+                    imgs.push($(this).data('src'));
+                });
+                let myData = new FormData(form);
+                myData.append("att", imgs);
+                myData.append("UserId", '@current_dt.UserId')
+                myData.append("ToId", '@current_dt.SubmitTo')
+                myData.append("FromId", '@current_dt.FromId')
+                myData.append("ObservationId", '@current_dt.ObservationId')
+                myData.append("FlowId", '@current_dt.FlowId')
+                request(url, myData)
+                    .then(response => {
+                        $('#modal-loader').modal('hide')
+                    })
+                    .catch((error) => {
+                        $('#modal-loader').modal('hide')
+                        if (error.status == 400) {
+                            let errors = error.responseJSON.reduce((acc, x) => {
+                                acc[x.propertyName] = x.errorMessage;
+                                return acc;
+                            }, {});
+
+                            $('#myform').validate().showErrors(errors);
+                        }
+                    });
+            }
+        }
+    }
+</script>

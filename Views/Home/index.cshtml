@@ -1,0 +1,286 @@
+@using Microsoft.AspNetCore.Http;
+@using System.Data;
+
+<section class="content">
+    <!-- job -->
+    <div class="row">
+        <div class="form-group col-sm-3">
+            <label for="division">Division</label>
+            <select id="division" class="form-control division-select2" multiple placeholder="select division">
+            </select>
+        </div>
+        <div class="form-group col-sm-3">
+            <label for="department">Department</label>
+            <select id="department" class="form-control department-select2" multiple >
+            </select>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            @if (Context.Session.GetString("app_name").Equals("QA") || Context.Session.GetString("role_name").Equals("Super Admin"))
+            {
+                <div class="col-12 row">
+                    <div class="col-lg-3 col-xs-6">
+                        <!-- small box -->
+                        <a href="~/ViewObservation">
+                            <div class="small-box bg-blue">
+                                <div class="inner">
+                                    <h3 id="nos_qa">@ViewBag.nos_qa</h3>
+
+                                    <p>Total QA Observations</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-pie-graph"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-xs-6">
+                        <!-- small box -->
+                        <a href="~/ViewObservation#custom-tabs-four-profile">
+                            <div class="small-box bg-red">
+                                <div class="inner">
+                                    <h3 id="nos_pqa">@ViewBag.nos_pqa</h3>
+
+                                    <p>QA Observations for Me</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row col-12">
+                    <h2 class="mb-3 text-dark">
+                        Status wise Stats
+                    </h2>
+                </div>
+
+
+
+                @foreach (var item in ViewBag.withStatus)
+                {
+                    if (item.Key == "With EIC DETP")
+                    {
+                        continue;
+                    }
+                    <div class="col-lg-2 col-md-3 col-6">
+                        <!-- small box -->
+                        <a onclick="return addDepartment(this,'@item.Key.ToLower().Replace("with eic detp", "with hod detp").Replace(" ","+")')" href="#">
+                            
+                            <div class="small-box bg-secondary">
+                                <div class="inner">
+                                    <h3 id="@item.Key.Replace(" ", "-")">@item.Value</h3>
+
+                                    @if (item.Key == "With Head DETP")
+                                    {
+                                        <p>With Sectional Head QA</p>
+                                    }
+                                    else if (item.Key == "With EIC DETP")
+                                    {
+                                        <p>With HoD DETP</p>
+
+                                    }
+                                    else
+                                    {
+                                        <p>@item.Key</p>
+                                    }
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+
+
+            }
+            @if (Context.Session.GetString("app_name").Equals("SHA") || Context.Session.GetString("role_name").Equals("Super Admin"))
+            {
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-blue">
+                        <div class="inner">
+                            <h3>@ViewBag.nos_sha</h3>
+
+                            <p>Total SHA Jobs</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <a href="~/SHAViewRequests">
+
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3>@ViewBag.nos_psha</h3>
+
+                                <p>Action Pending with SHA Team</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-exclamation-circle"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>@ViewBag.nos_csha</h3>
+
+                            <p>Action Pending with Customer</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-exclamation-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Context.Session.GetString("app_name").Equals("Design") || Context.Session.GetString("role_name").Equals("Super Admin"))
+            {
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-blue">
+                        <div class="inner">
+
+                            <h3>@ViewBag.nos_design</h3>
+
+                            <p>Total Design Observations</p>
+
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+
+
+<script>
+    $(document).ready(function(){
+        fetchDivisions();
+        $('#division').change(function(){
+            fetchDepartments($('#division').val()).then(()=>{
+                updateDashboard()
+            })
+        })
+        $('#department').change(function(){
+            updateDashboard()
+        })
+        $('.division-select2').select2({
+            placeholder: 'select division',
+            multiple: true,
+            width: 'resolve',
+            theme: "classic"
+        });
+
+        $('.department-select2').select2({
+            placeholder: 'select department',
+            multiple: true,
+            width: 'resolve',
+            theme: "classic"
+        })
+    })
+
+    async function updateDashboard(){
+
+        let divisionIds = $('#division').val();
+        let departmentIds = $('#department').val();
+
+        let divisionIdsParam = '';
+        let departmentIdsParam = '';
+
+
+        for(let i = 0; i < divisionIds.length; i++){
+            if(divisionIdsParam != ''){
+                divisionIdsParam += "&";
+            }
+            divisionIdsParam += "divisionIds="+divisionIds[i];
+        }
+
+        for(let i = 0; i < departmentIds.length; i++){
+            if(divisionIdsParam != '' || departmentIdsParam != ''){
+                departmentIdsParam += "&";
+            }
+            departmentIdsParam += "departmentIds=" + departmentIds[i];
+        }
+
+        const response = await fetch('@Url.Action("DashboardData")?' + divisionIdsParam + departmentIdsParam);
+        const data = await response.json();
+        $('#nos_qa').text(data.nos_qa);
+        $('#nos_pqa').text(data.nos_pqa);
+        $('#With-Site-Incharge').text(data.statusby['With Site Incharge'])
+        $('#With-Project-Incharge').text(data.statusby['With Project Incharge'])
+        $('#With-Dept-HOD').text(data.statusby['With Dept HOD'])
+        $('#With-Business-Head').text(data.statusby['With Business Head'])
+        $('#With-Assignee-Section').text(data.statusby['With Assignee Section'])
+        $('#With-Head-DETP').text(data.statusby['With Head DETP'])
+        $('#With-QA-Officer').text(data.statusby['With QA Officer'])
+        $('#With-EIC-DETP').text(data.statusby['With EIC DETP'])
+    }
+
+    async function fetchDepartments(id){
+
+        let parameter = "";
+        for(let i = 0; i < id.length; i++){
+            if(parameter != ""){
+                parameter += '&';
+            }
+            parameter += `ids=`+id[i];
+        }
+
+        const response = await fetch('@Url.Action("DepartmentByMultiDivisionId", "Departments")?' + parameter)
+        const departmentArray = await response.json();
+        const departmentElement = $('#department');
+        departmentElement.html(``)
+        for (let i = 0; i < departmentArray.length; i++) {
+            departmentElement.append(`<option value="${departmentArray[i]['id']}">${departmentArray[i]['name']}</option>`)
+        }
+    }
+
+    async function fetchDivisions(){
+        const response = await fetch('@Url.Action("AllDivision", "Divisions")')
+        const divisionsArray = await response.json();
+        const divisionElement = $('#division');
+        for(let i = 0; i < divisionsArray.length; i++){
+            divisionElement.append(`<option value="${divisionsArray[i]['id']}">${divisionsArray[i]['name']}</option>`)
+        }
+    }
+
+    function addDepartment(el, query){
+        let href = '@Url.Action("Find","ViewObservation")?column=status&query='+query;
+        let divisionIds = $('#division').val();
+        let departmentIds = $('#department').val();
+
+        let params = '';
+
+
+        for (let i = 0; i < divisionIds.length; i++) {
+            
+            params += "&divisionIds=" + divisionIds[i];
+        }
+
+        for (let i = 0; i < departmentIds.length; i++) {
+            
+            params += "&departmentIds=" + departmentIds[i];
+        }
+        href += params
+        $(el).attr('href', href);
+    }
+
+
+</script>

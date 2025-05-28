@@ -1,0 +1,460 @@
+﻿@using DETP.Constant
+@using DETP.data
+@using DETP.extensions
+@using DETP.model.QaViolation
+@inject ApplicationDbContext _context;
+
+@{
+	QaViolation violation = ViewBag.Violation;
+	var decisions = ViewBag.FlowDecisions;
+	QaViolationFlow currentFlow = ViewBag.CurrentFlow;
+}
+
+
+@section Head {
+<link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+}
+
+<div class="container mt-4">
+	<div id="accordion">
+		<div class="card card-primary">
+			<div class="card-header">
+				<h4 class="card-title w-100">
+					<a data-toggle="collapse" data-parent="#accordion" href="#Violation-Details" class="d-flex justify-content-between w-100">
+						<span>
+							Violation Request
+						</span>
+						<span>
+							<i class="fa fa-chevron-up"></i>
+						</span>
+					</a>
+				</h4>
+			</div>
+			<div id="Violation-Details" class="panel-collapse collapse">
+				<div class="card-body">
+					<div class="row">
+						<input value="@violation.Observation.SerialNo" id="ObservationId" name="ObservationId" type="hidden" />
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="vendorCode" class="form-label">Vendor Code</label>
+							<input type="text" class="form-control" id="vendorCode" placeholder="Enter Vendor Code" value="@violation.Observation.VendorCode" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="vendorName" class="form-label">Vendor Name</label>
+							<input type="text" class="form-control" id="vendorName" placeholder="Enter Vendor Name" value="@violation.Observation.VendorName" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="vendorEmail" class="form-label">Vendor Email ID</label>
+							<input type="email" class="form-control" id="VendorEmail" name="VendorEmail" placeholder="Enter Vendor Email ID" required value="@violation.VendorEmail" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="violationType" class="form-label">Type of Violation</label>
+							<input type="text" class="form-control" id="violationType" placeholder="Enter Type of Violation" value="Critical" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="division" class="form-label">Division</label>
+							<input type="text" class="form-control" id="division" placeholder="Enter Division" required value="@violation.Observation.Division?.name" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="department" class="form-label">Department</label>
+							<input type="text" class="form-control" id="department" placeholder="Enter Department" required value="@violation.Observation.Dept?.Name" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="location" class="form-label">Location</label>
+							<input type="text" class="form-control" id="location" placeholder="Enter Location" required value="@violation.Observation.Location" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="observationDate" class="form-label">Date of Observation</label>
+							<input type="date" class="form-control" id="observationDate" value="@violation.Observation.LoggedDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" disabled>
+						</div>
+
+
+						<div class="col-12 col-md-6 col-lg-4 mb-3">
+							<label for="violationCount" class="form-label">Violation Count</label>
+							<input type="number" class="form-control" id="violationCount" placeholder="Enter Violation Count" disabled value="@violation.Count">
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-6 mb-3">
+							<label for="observationDetails" class="form-label">Observation Details</label>
+							<textarea class="form-control" id="ObservationDetails" name="ObservationDetails" rows="3" placeholder="Enter Observation Details" required disabled>@violation.ObservationDetails</textarea>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-6 mb-3">
+							<label for="Attachment" class="form-label">Attachment</label>
+							<a href="ViolationAttachments/@violation.Attachment" download>download</a>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-3 mb-3">
+							<label for="createdBy" class="form-label">Created by</label>
+							<input type="text" class="form-control" id="createdBy" placeholder="Enter Created By" required value="@violation.CreatedBy.Name" disabled>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-3 mb-3">
+							<label for="createdOn" class="form-label">Created On</label>
+							<input type="date" class="form-control" id="createdOn" required value="@(violation.CreatedAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))" disabled>
+						</div>
+					</div>
+					<h5 class="my-2 bg-primary p-2 rounded">Panelty Details</h5>
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<label for="violationCategory" class="form-label">Category of Violation</label>
+							<input class="form-control" value="@violation.Category.Name" disabled />
+						</div>
+						<div class="col-md-6">
+							<label for="SubCategory" class="form-label">Sub Category</label>
+
+							<input class="form-control" value="@violation.SubCategory.Name" disabled />
+						</div>
+					</div>
+
+					<div class="row mb-3">
+						<div class="col-md-4">
+							<label for="financialPenalty" class="form-label">Financial Penalty</label>
+							<input type="text" class="form-control" id="financialPenalty" name="financialPenalty" disabled value="@violation.SubCategory.PenaltyDetail.FinancialPenalty">
+						</div>
+						<div class="col-md-4">
+							<label for="administrative" class="form-label">Administrative</label>
+							<input type="text" class="form-control" id="administrative" name="administrative" disabled value="@violation.SubCategory.PenaltyDetail.Administrative">
+						</div>
+						<div class="col-md-4">
+							<label for="Amount" class="form-label">Amount</label>
+							<input type="number" class="form-control" id="Amount" name="Amount" value="@violation.Amount" disabled>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		@foreach (var decision in decisions)
+		{
+			if (decision?.GetType() == typeof(QaViolationApproval))
+			{
+				QaViolationApproval data = decision;
+				<div class="card card-primary">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a data-toggle="collapse" data-parent="#accordion" href="#approval-@data.Id" class="d-flex justify-content-between w-100">
+								<span>
+									@data.Role.Name
+								</span>
+								<span>
+									<i class="fa fa-chevron-up"></i>
+								</span>
+							</a>
+						</h4>
+					</div>
+					<div id="approval-@data.Id" class="panel-collapse collapse">
+						<div class="card-body">
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label for="PenaltyClauseCorrect" class="form-label">Penalty Clause Correct</label>
+									<input value="@(data.PenaltyClauseCorrect ? "YES" : "NO")" class="form-control" disabled />
+								</div>
+								<div class="col-md-6">
+									<label for="PenaltyAmountCorrect" class="form-label">Penalty Amount Correct</label>
+
+									<input value="@(data.PenaltyAmountCorrect ? "YES" : "NO")" class="form-control" disabled />
+								</div>
+								<div class="col-md-6">
+									<label for="Comment" class="form-label">Comment</label>
+									<textarea name="Comment" id="Comment" class="form-control" disabled>@data.Comments</textarea>
+								</div>
+								<div class="col-md-6">
+									<label for="Attachment" class="form-label d-block">Attachment</label>
+									@if (data.Attachment != null)
+									{
+										<a href="ViolationAttachments/@data.Attachment" download>download</a>
+									}
+									else
+									{
+										<span class="text-muted">Not Available</span>
+									}
+								</div>
+								
+								<div class="col-md-6">
+									<label for="DecisionBy" class="form-label">Decision By</label>
+
+									<input value="@data.ApprovedBy.Name" class="form-control" disabled />
+								</div>
+								<div class="col-md-6">
+									<label for="ApprovedTime" class="form-label">Approved Time</label>
+
+									<input value="@data.CreatedAt.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)" class="form-control" disabled />
+								</div>
+							</div>
+
+
+						</div>
+					</div>
+				</div>
+			}
+			else if(decision?.GetType() == typeof(QaViolationCFOReview)){
+				QaViolationCFOReview data = decision;
+
+				<div class="card card-primary">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a data-toggle="collapse" data-parent="#accordion" href="#cfo" class="d-flex justify-content-between w-100">
+								<span>
+									CFO
+								</span>
+								<span>
+									<i class="fa fa-chevron-up"></i>
+								</span>
+							</a>
+						</h4>
+					</div>
+					<div id="cfo" class="panel-collapse collapse">
+						<div class="card-body">
+							<div class="row mb-3">
+								<div class="col-md-12">
+									<label for="Comment" class="form-label">Comment</label>
+									<textarea name="Comment" class="form-control" disabled>@data.Comments</textarea>
+								</div>
+								<div class="col-md-6">
+									<label for="DecucationDate" class="form-label">Deducation Date</label>
+									<input type="date" class="form-control" name="DeducationDate" disabled value="@data.DeducationDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"/>
+								</div>
+								<div class="col-md-6">
+									<label for="DebitNote" class="form-label">Debit Note No.</label>
+
+									<input name="DebitNote" id="DebitNote" class="form-control" disabled value="@data.DebitNote">
+								</div>
+								<div class="col-md-6">
+									<label for="DecisionBy" class="form-label">Decision By</label>
+
+									<input value="@data.ApprovedBy.Name" class="form-control" disabled />
+								</div>
+								<div class="col-md-6">
+									<label for="ApprovedTime" class="form-label">Approved Time</label>
+
+									<input value="@data.CreatedAt.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)" class="form-control" disabled />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+			else if (decision?.GetType() == typeof(QaViolationHeadProcurement))
+			{
+				QaViolationHeadProcurement data = decision;
+				<div class="card card-primary">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a data-toggle="collapse" data-parent="#accordion" href="#Head-Procurement" class="d-flex justify-content-between w-100">
+								<span>
+									Head Procurement
+								</span>
+								<span>
+									<i class="fa fa-chevron-up"></i>
+								</span>
+							</a>
+						</h4>
+					</div>
+					<div id="Head-Procurement" class="panel-collapse collapse">
+						<div class="card-body">
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label for="Comment" class="form-label">Comment</label>
+									<textarea name="Comment" class="form-control">@data.Comments</textarea>
+								</div>
+
+								<div class="col-md-6">
+									<label for="Attachment" class="form-label">Attachment</label>
+									<a href="ViolationAttachments/@data.Attachment" download>download</a>
+								</div>
+								<div class="col-md-6">
+									<label for="DecisionBy" class="form-label">Decision By</label>
+
+									<input value="@data.ApprovedBy.Name" class="form-control" disabled />
+								</div>
+								<div class="col-md-6">
+									<label for="ApprovedTime" class="form-label">Approved Time</label>
+									<input value="@data.CreatedAt.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)" class="form-control" disabled />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		}
+
+		@if (currentFlow != null)
+		{
+			if (currentFlow.TableName == _context.GetTableName<QaViolationApproval>())
+			{
+				<form id="approval-form">
+					<input type="hidden" id="FlowId" name="FlowId" value="@currentFlow.Id" />
+					<div class="card card-primary">
+						<div class="card-header">
+							<h4 class="card-title w-100">
+								<a data-toggle="collapse" data-parent="#accordion" href="#@currentFlow.ToRole.Name.Replace(" ","-").Replace("&","")" class="d-flex justify-content-between w-100">
+									<span>
+										@currentFlow.ToRole.Name
+									</span>
+									<span>
+										<i class="fa fa-chevron-up"></i>
+									</span>
+								</a>
+							</h4>
+						</div>
+						<div id="@currentFlow.ToRole.Name.Replace(" ","-").Replace("&","")" class="panel-collapse collapse">
+							<div class="card-body">
+								<div class="row mb-3">
+									<div class="col-md-6">
+										<label for="PenaltyClauseCorrect" class="form-label">Penalty Clause Correct</label>
+										<select class="form-control" id="PenaltyClauseCorrect" name="PenaltyClauseCorrect">
+											<option value="">Choose..</option>
+											<option value="true">Yes</option>
+											<option value="false">No</option>
+										</select>
+									</div>
+									<div class="col-md-6">
+										<label for="PenaltyAmountCorrect" class="form-label">Penalty Amount Correct</label>
+
+										<select class="form-control" name="PenaltyAmountCorrect" id="PenaltyAmountCorrect">
+											<option value="">Choose..</option>
+											<option value="true">Yes</option>
+											<option value="false">No</option>
+										</select>
+									</div>
+									@if (currentFlow.ToRole.Name == RoleNameConst.HOD_QA_SHA)
+									{
+										<div class="col-md-6">
+											<label for="Attachment" class="form-label">Attachment</label>
+											<input type="file" name="Attachment" id="Attachment" class="form-control">
+										</div>
+									}
+									<div class="col-md-12">
+										<label for="Comment" class="form-label">Comment</label>
+										<textarea name="Comment" id="Comment" class="form-control"></textarea>
+									</div>
+									<div class="col-md-12 mt-2">
+										@if (currentFlow.ToRole.Name == RoleNameConst.HOD_QA_SHA)
+										{
+											<input type="submit" name="Decision" value="Accept" class="btn btn-primary" />
+											<input type="submit" name="Decision" value="Reject" class="btn btn-danger mx-2" />
+										}
+										else
+										{
+											<input type="submit" class="btn btn-primary" />
+										}
+									</div>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+				</form>
+			}
+
+			if (currentFlow.TableName == _context.GetTableName<QaViolationCFOReview>())
+			{
+				<form id="cfo-form">
+					<input type="hidden" id="FlowId" name="FlowId" value="@currentFlow.Id" />
+					<div class="card card-primary">
+						<div class="card-header">
+							<h4 class="card-title w-100">
+								<a data-toggle="collapse" data-parent="#accordion" href="#@currentFlow.ToRole.Name.Replace(" ","-").Replace("&","")" class="d-flex justify-content-between w-100">
+									<span>
+										@currentFlow.ToRole.Name
+									</span>
+									<span>
+										<i class="fa fa-chevron-up"></i>
+									</span>
+								</a>
+							</h4>
+						</div>
+						<div id="@currentFlow.ToRole.Name.Replace(" ","-").Replace("&","")" class="panel-collapse collapse">
+							<div class="card-body">
+								<div class="row mb-3">
+									<div class="col-md-12">
+										<label for="Comment" class="form-label">Comment</label>
+										<textarea name="Comment" class="form-control"></textarea>
+									</div>
+									<div class="col-md-6">
+										<label for="DecucationDate" class="form-label">Deducation Date</label>
+										<input type="date" class="form-control" name="DeducationDate" />
+									</div>
+									<div class="col-md-6">
+										<label for="DebitNote" class="form-label">Debit Note No.</label>
+
+										<input name="DebitNote" id="DebitNote" class="form-control">
+									</div>
+									<div class="col-md-12 mt-2">
+
+										<input type="submit" class="btn btn-primary" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			}
+
+			if (currentFlow.TableName == _context.GetTableName<QaViolationHeadProcurement>())
+			{
+				<form id="head-procurement-form">
+					<input type="hidden" id="FlowId" name="FlowId" value="@currentFlow.Id" />
+					<div class="card card-primary">
+						<div class="card-header">
+							<h4 class="card-title w-100">
+								<a data-toggle="collapse" data-parent="#accordion" href="#@currentFlow.ToRole.Name.Replace(" ","-").Replace("&","")" class="d-flex justify-content-between w-100">
+									<span>
+										@currentFlow.ToRole.Name
+									</span>
+									<span>
+										<i class="fa fa-chevron-up"></i>
+									</span>
+								</a>
+							</h4>
+						</div>
+						<div id="@currentFlow.ToRole.Name.Replace(" ","-").Replace("&","")" class="panel-collapse collapse">
+							<div class="card-body">
+								<div class="row mb-3">
+									<div class="col-md-12">
+										<label for="Comment" class="form-label">Comment</label>
+										<textarea name="Comment" class="form-control"></textarea>
+									</div>
+
+									<div class="col-md-6">
+										<label for="Attachment" class="form-label">Attachment</label>
+
+										<input type="file" name="Attachment" id="Attachment" class="form-control">
+									</div>
+									<div class="col-md-12 mt-2">
+										<input type="submit" class="btn btn-primary" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			}
+		}
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+	<script src="~/dist/js/qaviolation/action.js"></script>
+
+	<script>
+		window.addEventListener('DOMContentLoaded', function () {
+			const elems = document.getElementsByClassName('collapse');
+			for (let el of elems) {
+				el.classList.add('show');
+			}
+
+
+		});
+	</script>
+}

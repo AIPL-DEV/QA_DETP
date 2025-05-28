@@ -1,0 +1,114 @@
+﻿<div class="container mt-4">
+	<div class="card">
+		<div class="card-header">
+			Search Filters
+		</div>
+		<div class="card-body">
+			<form id="SearchForm" method="post">
+				<div class="row g-3">
+					<div class="col-12 col-md-6 col-lg-3">
+						<label for="FinancialYear" class="form-label">Select Financial Year</label>
+						<select id="FinancialYear" name="FinancialYear" class="form-control">
+							<option selected disabled>Choose...</option>
+							@{
+								var currentYear = DateTime.Now.Year;
+								if(DateTime.Now.Month > 3)
+								{
+									currentYear++;
+								}
+								for (var i = currentYear; i >= 2023; i--)
+								{
+									<option value="@i">FY - @i</option>
+								}
+							}
+						</select> 
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-3">
+						<label for="Month" class="form-label">Select Month</label>
+						<select id="Month" name="Month" class="form-control">
+							<option selected disabled>Choose...</option>
+							<option value="1">January</option>
+							<option value="2">February</option>
+							<option value="3">March</option>
+							<option value="4">April</option>
+							<option value="5">May</option>
+							<option value="6">June</option>
+							<option value="7">July</option>
+							<option value="8">August</option>
+							<option value="9">September</option>
+							<option value="10">October</option>
+							<option value="11">November</option>
+							<option value="12">December</option>
+						</select>
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-3">
+						<label for="VendorCode" class="form-label">Enter Vendor Code</label>
+						<input type="text" id="VendorCode" name="VendorCode" class="form-control" placeholder="Vendor Code">
+					</div>
+
+					<div class="col-12 col-md-6 col-lg-3 d-flex align-items-end">
+						<button type="submit" class="btn btn-primary w-100">Search</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="table-responsive">
+		<table class="table" id="violation-table">
+			<thead>
+				<tr>
+					<th>
+						Visit No.
+					</th>
+					<th>
+						Div Name
+					</th>
+					<th>
+						Dept Name
+					</th>
+					<th>
+						Logged Date
+					</th>
+					<th>
+						Vendor Code
+					</th>
+					<th>
+						Vendor Name
+					</th>
+					<th>
+						Log Non Confirmance
+					</th>
+					<th>
+						No. of Observation
+					</th>
+					<th>
+						Site
+					</th>
+					<th>
+						Site Incharge
+					</th>
+					<th>
+						Project Incharge
+					</th>
+					<th>
+						Dept HOD
+					</th>
+					<th>
+						Business Head
+					</th>
+					<th>
+						Action
+					</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script src="~/dist/js/qaviolation/index.js"></script>
+}

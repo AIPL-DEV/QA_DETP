@@ -1,0 +1,203 @@
+﻿@using System.Data;
+<section class="content">
+    <!-- request -->
+
+    <div class="container-fluid">
+        @{ DateTime defaultDate = default(DateTime);
+
+            var userDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+        <div class="card">
+            <!-- form start -->
+            <form role="form" id="myform">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="date">Request Date</label>
+                        <input type="text" value="@userDt" class="form-control" id="date" name="date" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" class="form-control" name="location" id="location" placeholder="Location">
+                    </div>
+                    <div class="form-group">
+                        <label for="job_name">Job Name</label>
+                        <input type="text" class="form-control" name="job_name" id="job_name" placeholder="Job Name">
+                    </div>
+                    <div class="form-group">
+                        <table border="2" cellpadding="10" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Photographs (Only Image Files Allowed)
+                                    </th>
+                                    <th>Observation Details</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="image_app">
+
+                                <tr id="row0">
+                                    <td> <input type="file" class="form-control" id="fileInput" name="img[]" onchange="upimg(this,0)" accept="image/*" multiple> <textarea name="img_data[]" id="img_data" class="form-control" rows="3" placeholder="" hidden></textarea></td>
+                                    <td> <textarea name="observation" id="observation" class="form-control" rows="3" placeholder=""></textarea></td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary float-right" onclick="addimgrow()">Add</button>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        <label for="Status">Action</label>
+                        <select name="ac" id="ac" class="form-control">
+                            <option value="save">Save</option>
+                            <option value="fwd">Save & Forward</option>
+                        </select>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button id="submit_sha_request" type="button" class="btn btn-primary float-right" onclick="SubmitRequest()" data-request-url="@Url.Action("Submit", "UploadDesignObservations")">Submit</button>
+                </div>
+                <script>
+                                var lineNo2 = 1;
+
+                                function addimgrow() {
+                                    markup = "  <tr id='row" + lineNo2 + "'><td> <input type='file' name='img[]' onChange='upimg(this," + lineNo2 +")' class='form-control' id='fileInput' accept='image/*' multiple> <textarea name='img_data[]' id='img_data' class='form-control' rows='3' placeholder='' hidden></textarea></td> <td> <textarea name='observation' id='observation' class='form-control' rows='3' placeholder=''></textarea></td> <td></td></tr>";
+
+                                    lineNo2 = lineNo2+1;
+                                    tableBody = $("#image_app");
+                                    tableBody.append(markup);
+                                }
+
+                                function getBase64(file,ln2) {
+                                var reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                    reader.onload = function () {
+                                        $('#row'+ln2).find('textarea').first().val(reader.result);
+                                    };
+                                reader.onerror = function (error) {
+                                    console.log('Error: ', error);
+                                    };
+                            }
+                                function upimg(s,ln) {
+                                    img_array = [];
+                                    var files = s.files;
+                                    for (var i = 0; i < files.length; i++) {
+                                        if (files.length > 0) {
+                                            var ext = files[i].name.substr(-3);
+                                            if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif") {
+                                                getBase64(files[i],ln);
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                                                $('#myform').validate({
+                                                    rules: {
+                                                        location: {
+                                                            required: true
+                                                        },
+                                                        job_name: {
+                                                            required: true
+
+                                                        }
+
+                                                    },
+                                                   errorElement: 'span',
+                                                    errorPlacement: function (error, element) {
+                                                        error.addClass('invalid-feedback');
+                                                        element.closest('.form-group').append(error);
+                                                    },
+                                                    highlight: function (element, errorClass, validClass) {
+                                                        $(element).addClass('is-invalid');
+                                                    },
+                                                    unhighlight: function (element, errorClass, validClass) {
+                                                        $(element).removeClass('is-invalid');
+                                                    }
+                                                });
+                    function SubmitRequest() {
+                                                    if ($('#myform').valid()) {
+                                                        $('#modal-loader').modal('show')
+                                                        $('#submit_request').prop('disabled', true)
+
+                                                        var url = $('#submit_sha_request').data('request-url');
+
+                                                        var dataToSend = {
+                                                            observation: $("textarea[id='observation']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            photos: $("textarea[id='img_data']")
+                                                                .map(function () { return $(this).val(); }).get(),
+                                                            ac: $('#ac').val(),
+                                                            date: $('#date').val(),
+
+                                                            location: $('#location').val(),
+                                                            job_name: $('#job_name').val()
+                                                        }
+                                                        console.log(dataToSend);
+                                                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: url,
+                                                                data: dataToSend,
+                                                                datatype: "json",
+                                                                error: function (result) {
+                                                                    alert("There is a Problem, Try Again!");
+                                                                },
+                                                                success: function (result) {
+                                                                    if (result.status == true) {
+                                                                        $('#modal-loader').modal('hide')
+                                                                        $('#submit_request').prop('disabled', false)
+                                                                        $('#myform').trigger('reset')
+                                                                        $('#modal-success').modal('show')
+                                                                         setTimeout(function () {// wait for 5 secs(2)
+                         window.location.href = "@Url.Action("Index", "UploadDesignObservations")";
+ // then reload the page.(3)
+                                                                                }, 3000);
+                                                                    }
+                                                                    else {
+                                                                        alert(result.message);
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                </script>
+            </form>
+        </div>
+
+    </div><!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please Wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Site Observation Uploaded Successfully<br /><br /><center>Please be patient you are being redirected...</center>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+<script src="~/plugins/jquery-validation/jquery.validate.min.js"></script>

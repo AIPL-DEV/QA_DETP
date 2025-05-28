@@ -1,0 +1,120 @@
+﻿<section class="content">
+    <!-- request -->
+    <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="../../dist/js/request.js"></script>
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <!-- form start -->
+            <form role="form" id="myform">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" disabled="disabled" value="@DateTime.Now.ToString("yyyy-MM-dd")" class="form-control" id="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="department" class="form-control">
+                            <option>Department 1</option>
+                            <option>Department 2</option>
+                            <option>Department 3</option>
+                            <option>Department 4</option>
+                            <option>Department 5</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="name_of_structure">Name of Structure</label>
+                        <input type="text" class="form-control" name="name_of_structure" id="name_of_structure" placeholder="Name of Structure">
+                    </div>
+                    <div class="form-group">
+                        <label for="cost_center">Cost Center</label>
+                        <input type="number" class="form-control" name="cost_center" id="cost_center" placeholder="Cost Center">
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select name="priority" id="priority" class="form-control">
+                            <option>L</option>
+                            <option>M</option>
+                            <option>H</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_person_name">Contact Person Name</label>
+                        <input type="text" class="form-control" name="contact_person_name" id="contact_person_name" placeholder="Contact Person Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_person_email">Contact Person Email</label>
+                        <input type="email" class="form-control" name="contact_person_email" id="contact_person_email" placeholder="Contact Person Email">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_person_phone">Contact Person Phone</label>
+                        <input type="tel" class="form-control" name="contact_person_phone" id="contact_person_phone" placeholder="Contact Person Phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select name="location" id="location" class="form-control">
+                            <option>Location 1</option>
+                            <option>Location 2</option>
+                            <option>Location 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Structure Type</label>
+                        <select name="structure_type" id="structure_type" class="form-control">
+                            <option>Quarter and Buglow Flats</option>
+                            <option>Flats</option>
+                            <option>Hospital/Dispensary</option>
+                            <option>Stadium</option>
+                            <option>Office/Commercial (RCC/Masonry)</option>
+                            <option>Industrial (RCC/Masonry)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="number_of_structure">Number of Structure</label>
+                        <input type="number" class="form-control" name="number_of_structure" id="number_of_structure" placeholder="Number of Structure">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Brief Description"></textarea>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button id="submit_request" type="submit" class="btn btn-primary float-right" onclick="Submit()">Submit</button>
+                </div>
+            </form>
+        </div>
+
+    </div><!-- /.container-fluid -->
+    <!-- modal-->
+    <div class="modal" id="modal-loader">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+                    <p class="text-center">Please wait</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- modal-->
+    <div class="modal fade" id="modal-success">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+                    <p class="text-center">Request generated successfully<br />Your Job Request Number is</p>
+                    <b><p class="text-center" id="job_request_no"></p></b>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>

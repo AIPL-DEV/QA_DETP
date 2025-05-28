@@ -1,0 +1,130 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Data;
+@using DETP.model;
+@model Tuple<DataTable>
+
+@section Head{
+    <style>
+        .dt-buttons.btn-group.flex-wrap {
+            float: right;
+            margin: 8px;
+        }
+    </style>
+
+    <link href="~/plugins/selectpage/selectpage.css" rel="stylesheet" />
+}
+
+<section class="content">
+    <!-- job -->
+    <div class="container-fluid">
+        <div class="card">
+
+            <div class="text-center">
+                <p class="text-danger">@ViewBag.error </p>
+            </div>
+
+            <div class="card-body">
+                <form onsubmit="submit">
+                    <div class="row">
+                        <div class="col-sm-3 form-group">
+                            <label for="division_id">Division</label>
+                            <input name="division_id" id="division_id" class="form-control" placeholder="Select Division" />
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label for="department">Department</label>
+                            <input name="department" id="department" class="form-control" placeholder="Select Department">
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label for="type">Type</label>
+                            <select class="form-control" name="type" id="type">
+                                <option value="critical">Critical</option>
+                                <option value="noncritical">Non Critical</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label for="StartDate">Start Date</label>
+                            <input type="date" class="form-control" name="StartDate" id="StartDate" />
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="EndDate">EndDate</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="date" class="form-control" name="EndDate" id="EndDate" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <button class="btn btn-dark">Export</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div><!-- /.container-fluid -->
+    </div><!-- /.container-fluid -->
+</section>
+
+@section Scripts{
+    
+    <script>
+        let selectedDivisions = []
+        let departments = []
+        let selectedDepartments = []
+        $(document).ready(function () {
+            $('#division_id').on('blur', function () {
+                const divisions = $('#division_id').val()
+                selectedDivisions = divisions.split(",");
+                fetchDepartments(divisions.split(","));
+                
+            });
+
+            $('#department').on('blur', function () {
+                const departments = $('#department').val()
+
+                selectedDepartments = departments.split(",");
+
+                console.log("department blured", selectedDepartments);
+
+            });
+
+            $('#division_id').selectPage({
+                showField: 'name',
+                keyField: 'id',
+                data: @Html.Raw(Json.Serialize(ViewBag.divisions)),
+                multiple: true,
+                pagination: false,
+            });
+
+            $('#department').selectPage({
+                showField: 'abbr',
+                keyField: 'id',
+                data: departments,
+                multiple: true,
+                pagination: false,
+            })
+        });
+        function departmentSelectPage(data){
+
+            departments = data;
+            $('#department').selectPageData(data)
+            $('#department').selectPageRefresh()
+        }
+
+        async function fetchDepartments(id) {
+
+            let parameter = "";
+            for (let i = 0; i < id.length; i++) {
+                if (parameter != "") {
+                    parameter += '&';
+                }
+                parameter += `ids=` + id[i];
+            }
+
+            const response = await fetch('@Url.Action("DepartmentByMultiDivisionId", "Departments")?' + parameter)
+            const departmentArray = await response.json();
+            departmentSelectPage(departmentArray);
+        }
+    </script>
+}

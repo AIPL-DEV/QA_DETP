@@ -1,0 +1,367 @@
+﻿@using System.Data;
+@using DETP.model;
+
+@{
+	List<Department> departments = ViewBag.departments;
+	User loggedUser = ViewBag.loggedUser;
+	List<User> appUsers = ViewBag.appUsers;
+	List<User> businessHeads = ViewBag.businessHeads;
+	User headDetp = ViewBag.headDetp;
+
+}
+
+<script>var imageIndex = 0;</script>
+<section class="content">
+
+	<div class="container-fluid">
+
+		<div class="card">
+			<form role="form" id="qa-observation-form" enctype="multipart/form-data">
+				<!-- form start -->
+				<div class="card-body">
+					<div class="row">
+						<div class="col-sm-4 form-group">
+							<label>Division</label>
+							<select name="division_id" id="division_id" class="form-control">
+								<option value="" disabled selected>select division</option>
+								@for (int i = 0; i < ViewBag.divisions.Count; i++)
+								{
+									Division division = ViewBag.divisions[i];
+									<option value="@division.id">@division.name</option>
+								}
+							</select>
+						</div>
+						<div class="col-sm-4 form-group">
+							<label>Department</label>
+							<select name="department" id="department" class="form-control">
+								<option value="" disabled selected>select department</option>
+								@for (int i = 0; i < departments.Count; i++)
+								{
+									Department department = departments[i];
+									<option value="@department.Id">@department.Abbr</option>
+								}
+							</select>
+						</div>
+
+						<div class="col-sm-4 form-group">
+							<label for="site">Site</label>
+							<input type="text" class="form-control" name="site" id="site" placeholder="Site">
+						</div>
+
+						<div class="col-sm-6 form-group">
+							<label for="location">Location</label>
+							<input type="text" class="form-control" name="location" id="location" placeholder="Location">
+						</div>
+
+						<div class="col-sm-6 form-group">
+							<label>Nature of Work</label>
+							<select name="nature_of_work" id="nature_of_work" class="form-control">
+								<option>Civil</option>
+								<option>MEP</option>
+								<option>Electrical</option>
+								<option>Road</option>
+							</select>
+						</div>
+						<div class="col-sm-6 form-group">
+							<div class="row col-sm-12">
+								<div class="col-sm-12">
+									<label>Type of Observataion</label>
+									<select name="type_of_observation" id="type_of_observation" class="form-control">
+										<option value="">Select</option>
+										<option value="Non Confirmnace">Non Confirmance</option>
+										<option value="Good Observation">Good Observation</option>
+									</select>
+								</div>
+								<div class="col-sm-12 row form-group mt-2">
+									<label class="col-6">No. of observation</label>
+									<input class="col-6 form-control" type="number" name="number_of_observation" id="number_of_observation" required />
+								</div>
+								<div class="col-sm-12 row form-group">
+									<label class="col-6">Area of concern</label>
+									<input class="col-6 form-control" id="area_of_concern" name="area_of_concern" required />
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 placeholder_confirmnace"></div>
+						<div class="col-sm-6 form-group good">
+							<label for="log_confirmance">Log Confirmance</label>
+							<textarea rows="3" type="text" class="form-control" name="log_confirmance" id="log_confirmance" placeholder="Log Confirmance"></textarea>
+						</div>
+						<div class="col-sm-6 form-group non">
+							<label for="log_non_confirmance">Log Non Confirmance</label>
+							<textarea rows="5" type="text" class="form-control" name="log_non_confirmance" id="log_non_confirmance" placeholder="Log Non confirmance"></textarea>
+						</div>
+						<div class="col-sm-4 form-group non">
+							<label>Compliance Target Date</label>
+							<div class="input-group date" id="compliance_target_date_picker" data-target-input="nearest">
+								<input type="date" class="form-control datetimepicker-input" name="compliance_target_date" id="compliance_target_date" data-target="#compliance_target_date_picker" min="@(DateTime.Now.ToString("yyyy-MM-dd"))" />
+
+							</div>
+						</div>
+						<div class="col-sm-4 form-group non">
+							<label>Type of Confirmance</label>
+							<select name="type_of_confirmance" id="type_of_confirmance" class="form-control">
+								<option value="">Select</option>
+								<option>New</option>
+								<option>Repeat</option>
+							</select>
+						</div>
+						<div class="col-sm-4 form-group non">
+							<label>Nature of Non Confirmance</label>
+							<select name="nature_of_confirmance" id="nature_of_confirmance" class="form-control" onchange="onCritical(this.value)">
+								<option value="">Select</option>
+
+								<option>Minor</option>
+								<option>Major</option>
+								<option>Critical</option>
+							</select>
+						</div>
+						<div style="display:none;" class="col-sm-4 form-group critical_fileds">
+							<label>Standard Not Followed?</label>
+							<input type="hidden" id="standard" name="standard" value="">
+							<input type="radio" id="ystandard" name="standard" value="Yes"> Yes
+							<input type="radio" id="nstandard" name="standard" value="No"> No
+						</div>
+						<div style="display:none;" class="col-sm-4 form-group critical_fileds">
+							<label>Basics Not Followed?</label>
+							<input type="hidden" id="basics" name="basics" value="" disabled>
+							<input type="radio" id="ybasics" name="basics" value="Yes" disabled> Yes
+							<input type="radio" id="nbasics" name="basics" value="No" disabled> No
+						</div>
+
+						<div style="display:none;" class="col-sm-4 form-group critical_fileds">
+							<label>Job Stopped?</label>
+							<input type="hidden" id="jobStopped" name="jobStopped" value="">
+							<input type="radio" id="yjobStopped" name="jobStopped" value="Yes"> Yes
+							<input type="radio" id="njobStopped" name="jobStopped" value="No"> No
+						</div>
+
+						<div class="col-sm-4 form-group">
+							<label for="vendor_code">Vendor Code</label>
+							<input type="number" class="form-control" name="vendor_code" id="vendor_code" placeholder="Vendor Code">
+						</div>
+						<div class="col-sm-4 form-group">
+							<label for="vendor_name">Vendor Name</label>
+							<input type="text" class="form-control" name="vendor_name" id="vendor_name" placeholder="Vendor Name">
+						</div>
+						<div class="col-sm-4 form-group">
+							<label for="p_o_no">P.O No</label>
+							<input type="number" class="form-control" name="p_o_no" id="p_o_no" placeholder="P.O No">
+						</div>
+						<div class="col-sm-6 form-group" style="overflow: hidden">
+							<label>Site Incharge</label>
+							<select name="site_incharge" id="site_incharge" class="form-control select2" required>
+								<option value="">Select</option>
+								@for (int i = 0; i < appUsers.Count; i++)
+								{
+									<option value="@(appUsers[i].UserId)">@(appUsers[i].Name) / @(appUsers[i].Email) / @(appUsers[i].PNo)</option>
+								}
+							</select>
+						</div>
+						<div class="col-sm-6 form-group" style="overflow: hidden">
+							<label>Project Incharge</label>
+							<select name="project_incharge" id="project_incharge" class="form-control select2" required>
+								<option value="">Select</option>
+								@for (int i = 0; i < appUsers.Count; i++)
+								{
+									<option value="@(appUsers[i].UserId)">@(appUsers[i].Name) / @(appUsers[i].Email) / @(appUsers[i].PNo)</option>
+								}
+							</select>
+						</div>
+						<div class="col-sm-6 form-group" style="overflow: hidden">
+							<label>Department Head</label>
+							<select name="department_head" id="department_head" class="form-control select2" style="overflow: hidden" required>
+								<option value="">Select</option>
+								@for (int i = 0; i < appUsers.Count; i++)
+								{
+									<option value="@(appUsers[i].UserId)">@(appUsers[i].Name) / @(appUsers[i].Email) / @(appUsers[i].PNo)</option>
+								}
+							</select>
+						</div>
+						<div class="col-sm-6 form-group" style="overflow: hidden">
+							<label>Business Head</label>
+							<select name="business_head" id="business_head" class="form-control select2" style="overflow: hidden" required>
+								<option value="">Select</option>
+								@for (int i = 0; i < businessHeads.Count; i++)
+								{
+									<option value="@(businessHeads[i].UserId)">@(businessHeads[i].Name) / @(businessHeads[i].Email) / @(businessHeads[i].PNo)</option>
+								}
+							</select>
+						</div>
+						<div class="col-sm-6 form-group d-none">
+							<label>Sectional Head QA</label>
+							<select name="head_detp" id="head_detp" class="form-control">
+								<option value="@(headDetp.UserId)">@(headDetp.Name) / @(headDetp.Email) / @(headDetp.PNo)</option>
+							</select>
+						</div>
+
+
+
+						<div class="col-sm-6 form-group">
+							<label>QA Officer / Observation By</label>
+							<select name="qa_officer" id="qa_officer" class="form-control">
+								<option value="@loggedUser.UserId">@loggedUser.Name / @loggedUser.Email</option>
+							</select>
+						</div>
+
+						<div class="col-sm-6 form-group" style="display:none">
+							<label>Observation By</label>
+							<select name="observation_by" id="observation_by" class="form-control">
+								<option value="@loggedUser.UserId">@loggedUser.Name / @loggedUser.Email</option>
+							</select>
+						</div>
+
+
+						<div class="col-sm-6 form-group">
+							<label>Attachments</label>
+							<input onchange="showImage(this);" type="file" id="fileInput" name="fileInput" class="form-control" accept="image/*,application/*" multiple />
+						</div>
+						<div class="col-12">
+							<div class="row" id="images">
+							</div>
+						</div>
+
+						@{
+							DateTime defaultDate = default(DateTime);
+							var userDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+						}
+						<div class="col-sm-6 form-group">
+							<label>Observation Date</label>
+							<input type="text" class="form-control" name="observation_date" id="observation_date" value="@userDt" disabled>
+							<input type="hidden" name="actionurl" id="actionurl" value="@Url.Action("Index", "Home")">
+						</div>
+						<!-- /.form group -->
+					</div>
+				</div>
+				<div class="card-footer">
+					<button id="submit_observation" type="button" class="btn btn-primary float-right" onclick="SubmitQAObservation()" data-request-url="@Url.Action("SubmitQA", "QAObservation")">Submit</button>
+				</div>
+			</form>
+		</div>
+
+	</div><!-- /.container-fluid -->
+	<!-- modal-->
+	<div class="modal" id="modal-loader">
+		<div class="modal-dialog modal-sm modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body">
+					<img class="mx-auto d-block" src="~/dist/img/loader.gif" />
+					<p class="text-center">Please wait</p>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	<!-- modal-->
+	<div class="modal fade" id="modal-success">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p class="text-center"><i class="fas fa-3x fa-check-circle"></i></p>
+					<p class="text-center">Observation Submited Successfully<br />Your Visit Number is</p>
+					<b><p class="text-center" id="visit_no"></p></b><br>
+					<p class="text-center"> Kindly Be Patient You are Being Redirected...</p>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+</section>
+<!-- Select2 -->
+@section Scripts {
+	@* <script src="~/dist/js/qaobservation.js"></script> *@
+	<script>
+		var imgs = [];
+
+		function showImage(input) {
+			if (input.files && input.files[0]) {
+
+				var files = input.files;
+
+				for (var i = 0; i < files.length; i++) {
+					var reader = new FileReader();
+					reader.readAsDataURL(files[i]);
+					reader.onload = function (e) {
+						if (e.target.result.startsWith("data:image")) {
+							$('#images').append(`
+								   <div class="card" style="width: 10rem;">
+
+										<a href="#" class="text-danger" onclick="removeImg(this,${imageIndex});return false;" style="position: absolute; right: 0;">
+											<i class="fa fa-times"></i>
+										</a>
+														<img class="card-img-top image-upload" data-src="${e.target.result}" src='${e.target.result}' />
+
+									</div>
+								`);
+						}
+						else {
+							$('#images').append(`
+								   <div class="card mr-3" style="max-height: 8rem;">
+
+										<a href="#" class="text-danger" onclick="removeImg(this,${imageIndex});return false;" style="position: absolute; right: 5px;">
+											<i class="fa fa-times"></i>
+										</a>
+
+											<i class="fa fa-file-pdf fa-5x"></i>
+										<div class="text-center mt-1">
+															<a data-src="${e.target.result}" href="#" onclick="openInNew('${e.target.result}'); return false;" target="_blank" class="btn btn-sm btn-primary image-upload">View</a>
+										</div>
+
+									</div>
+								`);
+						}
+						imageIndex++;
+						imgs.push(e.target.result);
+
+					};
+
+				}
+			}
+		}
+		function openInNew(value) {
+			var w = window.open('');
+			w.document.write(
+				`<iframe width='100%' height='100%' src='${value}'></iframe>`
+			)
+		}
+		function removeImg(el, index) {
+			var src = $(el).attr('src');
+			$(el).parent().remove();
+			index = imgs.indexOf(src);
+			imgs.splice(index, 1);
+			imageIndex--;
+		}
+
+		$(document).ready(function () {
+			$('#division_id').on('change', function () {
+				fetch('@Url.Action("DepartmentByDivisionId", "Departments")/' + this.value)
+					.then(res => res.json())
+					.then(res => {
+						let html = "";
+						let departments = res;
+						for (var i = 0; i < departments.length; i++) {
+							html += `<option value="${departments[i].id}">${departments[i].name}</option>`
+						}
+						console.log(departments);
+						console.log(html);
+						$('#department').html(html);
+					});
+			});
+		});
+
+		$('input[id=ystandard]').click(function () {
+			$('input[id=nbasics]').prop('checked', true)
+			$('input[id=ybasics]').prop('checked', false)
+
+		});
+		$('input[id=nstandard]').click(function () {
+			$('input[id=ybasics]').prop('checked', true)
+			$('input[id=nbasics]').prop('checked', false)
+
+		});
+	</script>
+}

@@ -1,0 +1,48 @@
+﻿@model HodQaShaCardModel
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#head-detp-@Model.Index">  
+              <span>
+                    HoD QA & SHA
+              </span>
+            </a>
+        </h4>
+    </div>
+    <div id="head-detp-@Model.Index" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-6 form-group">
+                    <label>Decision</label>
+                    <p name="decision" class="border rounded p-2">
+                        <span>@Model.HodQaSha.Decision</span>
+                    </p>
+                </div>
+
+                @if (Model.HodQaSha.Remarks != "")
+                {
+                    <div class="col-6 form-group">
+                        <label>Remarks</label>
+                        <pre name="remarks" class="border rounded p-2">@Model.HodQaSha.Remarks</pre>
+                    </div>
+                }
+                <div class="col-6 form-group">
+                    <label>Decision By</label>
+                    <p name="decision_by" class="border rounded p-2">
+                        <span>@Model.HodQaSha.DecisionBy?.Name</span>
+                    </p>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Decision Date</label>
+                    <p name="decision_date" class="border rounded p-2">
+                        <span>@Model.HodQaSha.DecisionDate?.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+
+                <!-- /.form group -->
+            </div>
+        </div>
+    </div>
+</div>

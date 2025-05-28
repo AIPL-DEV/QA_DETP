@@ -1,0 +1,153 @@
+﻿@model QAOfficerCreateRequest
+
+@{
+    var current_dt = ViewData["current_dt"] as CurrentFlow;
+}
+
+<div class="col-12 form-group">
+    <label>Compliance Satisfactory</label>
+    <select asp-for="ComplianceSatisfactory" class="form-control">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+    </select>
+</div>
+<div class="col-12 form-group">
+    <label>Within SLG?</label>
+    <select asp-for="WithinSlg" class="form-control">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+    </select>
+</div>
+<div class="col-12 form-group">
+    <label for="remarks">Remarks</label>
+    <textarea asp-for="Remarks" type="text" class="form-control" placeholder="Remarks"></textarea>
+</div>
+
+<div class="col-12 form-group">
+    <label for="remarks">Attachments</label>
+    <input type="file" onchange="showImage(this)" class="form-control" name="fileInput" id="fileInput" multiple>
+</div>
+
+<div class="col-12">
+    <div class="row" id="images">
+    </div>
+</div>
+
+<div class="col-12 form-group">
+    <label>Decision By</label>
+    <select name="decision_by" id="decision_by" class="form-control">
+        <option value="@current_dt.UserId">@current_dt.Name</option>
+    </select>
+</div>
+
+<div class="col-12 form-group">
+    @{
+        var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+    }
+    <label>Decision Date</label>
+
+    <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+</div>
+<script>
+    var img_array = [];
+    function getBase64(file) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+
+            img_array.push(reader.result);
+
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    $(function () {
+        img_array = [];
+        var files = document.getElementById('fileInput').files;
+        for (var i = 0; i < files.length; i++) {
+            if (files.length > 0) {
+
+                var ext = files[i].name.split('.').pop();
+                var extension = ["png", "jpg", "jpeg", "gif", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx"]
+
+                if (extension.includes(ext)) {
+                    getBase64(files[i]);
+                }
+            }
+        }
+    });
+
+    $('#myform').validate({
+        rules: {
+            compliance_satisfactory: {
+                required: true
+            },
+            remarks: {
+                required: true
+            },
+            decision_date: {
+                required: true
+            }
+        },
+        messages: {
+            decision_date: {
+                required: "This field is required"
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            Submit(form);
+        }
+    });
+
+    function Submit(form) {
+        if ($('#myform').valid()) {
+            $('#modal-loader').modal('show')
+            $('#submit_request').prop('disabled', true)
+
+            
+            var url = "@Url.Action("SaveQAOfficer", "QAFlow")"
+
+            imgs = [];
+            $('.image-upload').each(function () {
+                imgs.push($(this).data('src'));
+            });
+
+            let myData = new FormData(form);
+            myData.append("Att", imgs);
+            myData.append("To", '@current_dt.SubmitTo')
+            myData.append("From", '@current_dt.FromId')
+            myData.append("ObservationId", '@current_dt.ObservationId')
+            myData.append("FlowId", '@current_dt.FlowId')
+
+            request(url, myData)
+                .then(response => {
+                    $('#modal-loader').modal('hide')
+                })
+                .catch((error) => {
+                    $('#modal-loader').modal('hide')
+                    if (error.status == 400) {
+                        let errors = error.responseJSON.reduce((acc, x) => {
+                            acc[x.propertyName] = x.errorMessage;
+                            return acc;
+                        }, {});
+                        console.log(errors)
+                        $('#myform').validate().showErrors(errors);
+                    }
+                });
+        }
+    }
+</script>

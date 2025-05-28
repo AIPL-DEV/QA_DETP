@@ -1,0 +1,318 @@
+﻿@model ObservationCardModel
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#Observation-Details">
+                Observation Details
+            </a>
+        </h4>
+    </div>
+    <div id="Observation-Details" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-sm-6 form-group">
+
+                    <label>Visit No.</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.VisitNo</span>
+                    </p>
+
+                </div>
+
+                <div class="col-sm-6 form-group">
+
+                    <label>Status</label>
+                    <p class="border rounded p-2">
+                        <span>
+                            @if (Model.Observation.Status.Contains("Head DETP"))
+                            {
+                                <span>With Sectional Head QA</span>
+                            }
+                            else if (Model.Observation.Status.Contains("Close"))
+                            {
+                                <span>Closed</span>
+                            }
+                            else if (Model.Observation.Status.Contains("EIC DETP"))
+                            {
+                                <span>With HoD DETP</span>
+                            }
+                            else
+                            {
+                                @Model.Observation.Status
+                            }
+                        </span>
+                    </p>
+
+                </div>
+
+                <div class="col-sm-4 form-group" style="display:block!important;">
+
+                    <label>Division</label>
+                    <p name="division" id="division" class="border rounded p-2">
+                        <span>@Model.Observation.Division?.name</span>
+                    </p>
+                </div>
+
+
+                <div class="col-sm-4 form-group">
+                    <label>Department</label>
+                    <p name="department" id="department" class="border rounded p-2">
+                        <span>@Model.Observation.Dept?.Name</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-4 form-group">
+                    <label>Site</label>
+                    <p class="border rounded p-2">
+                        <span value="@Model.Observation.Site">@Model.Observation.Site</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-6 form-group">
+                    <label>Location</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.Location</span>
+                    </p>
+                </div>
+
+
+                <div class="col-sm-6 form-group">
+                    <label>Nature of Work</label>
+                    <p name="nature_of_work" id="nature_of_work" class="border rounded p-2">
+                        <span>@Model.Observation.NatureOfWork</span>
+                    </p>
+                </div>
+
+
+                <div class="col-sm-6 form-group">
+                    <div>
+                        <label>Type of Observation</label>
+                        <p class="border rounded p-2">
+                            <span>@Model.Observation.TypeOfObservation</span>
+                        </p>
+                    </div>
+                    <div class="col-sm-12 row form-group mt-2">
+                        <label class="col-6">No of observation</label>
+                        <p class="col-6 form-control border rounded p-1">@Model.Observation.NumberOfObservation</p>
+                    </div>
+                    @if (Model.Observation.TypeOfObservation.Trim().ToLower().Equals("non confirmnace"))
+                    {
+                        <div class="col-sm-12 row form-group">
+                            <label class="col-6">Area of concern</label>
+                            <p class="col-6 form-control border rounded p-1">@Model.Observation.AreaOfConcern</p>
+                        </div>
+                    }
+
+                </div>
+                <div class="col-sm-6 form-group">
+                    @if (@Model.Observation.TypeOfObservation.Trim().ToLower().Equals("non confirmnace"))
+                    {
+                        <label>Log Non Confirmance</label>
+                        <pre class="border rounded p-2" style="min-height: 170px">@Model.Observation.LogNonConfirmance</pre>
+                    }
+                    else
+                    {
+                        <label>Log Confirmance</label>
+                        <pre class="border rounded p-2" style="min-height: 100px">@Model.Observation.LogConfirmance</pre>
+                    }
+                </div>
+
+                <div class="col-sm-4 form-group">
+                    <label>Compliance Target Date</label>
+                    <p name="compliance_target_date" id="compliance_target_date" class="border rounded p-2">
+                        <span>@Model.Observation.ComplianceTargetDate.Value.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+
+
+                <div class="col-sm-4 form-group">
+                    <label>Type of Confirmance</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.TypeOfConfirmance</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-4 form-group">
+                    <label>Nature of Confirmance</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.NatureOfConfirmance</span>
+                    </p>
+                </div>
+
+
+                @if (Model.Observation.NatureOfConfirmance.Equals("Critical"))
+                {
+
+                    <div class="col-sm-4 form-group">
+                        <label>Standard</label>
+                        <p class="border rounded p-2">
+                            <span>@Model.Observation.Standard</span>
+                        </p>
+                    </div>
+                    <div class="col-sm-4 form-group">
+                        <label>Basics</label>
+                        <p class="border rounded p-2">
+                            <span>@Model.Observation.Basics</span>
+                        </p>
+                    </div>
+
+
+
+
+                    <div class="col-sm-4 form-group">
+                        <label>Job Stop</label>
+                        <p class="border rounded p-2">
+                            <span>@Model.Observation.Job</span>
+                        </p>
+                    </div>
+                }
+
+
+                <div class="col-sm-4 form-group">
+                    <label>Vendor Code</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.VendorCode</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-4 form-group">
+                    <label>Vendor Name</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.VendorName</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-4 form-group">
+                    <label>P.O No</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.Pno</span>
+                    </p>
+                </div>
+                <div class="col-sm-6 form-group">
+                    <label>Site Incharge</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.SiteIncharge.Name / @Model.Observation.SiteIncharge.Email / @Model.Observation.SiteIncharge.PNo</span>
+                    </p>
+                </div>
+                <div class="col-sm-6 form-group">
+                    <label>Project Incharge</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.ProjectIncharge.Name / @Model.Observation.ProjectIncharge.Email / @Model.Observation.ProjectIncharge.PNo</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-6 form-group">
+                    <label>Department Head</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.DeptHod.Name / @Model.Observation.DeptHod.Email / @Model.Observation.DeptHod.PNo</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-6 form-group">
+                    <label>Business Head</label>
+                    <p name="business_head" id="business_head" class="border rounded p-2">
+                        <span>@Model.Observation.BusinessHead.Name / @Model.Observation.BusinessHead.Email / @Model.Observation.BusinessHead.PNo</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-6 form-group">
+                    @*<label>Head DETP</label>*@
+
+
+                    <label>Sectional Head QA</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.HeadDetp?.Name / @Model.Observation.HeadDetp?.Email / @Model.Observation.HeadDetp?.PNo</span>
+                    </p>
+                </div>
+
+                @{
+                    // DataTable attachment = (from kvp in values where kvp.Key == "Attachment" select kvp.Value).FirstOrDefault();
+                    List<QaAtt> attachment = Model.Observation.Atts;
+                }
+
+                <div class="col-12 form-group">
+                    <div class="row">
+                        <label class="col-6">Attachments</label>
+                        <div class="col-6 text-right">
+                            @if (Model.IsSuperAdmin)
+                            {
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add_image_modal" type="button" onclick="$('#type_id').val('@Model.Observation.SerialNo'); $('#type').val('observation')">Add Image</button>
+                            }
+
+                        </div>
+                        <br>
+                    </div>
+                    <div class="row">
+                        @if (attachment != null)
+                        {
+                            @for (int i = 0; i < attachment.Count; i++)
+                            {
+                                var images = attachment[i].Data.Split("data:");
+                                foreach (var image in images)
+                                {
+                                    if (image == "")
+                                    {
+                                        continue;
+                                    }
+                                    var dataUrl = image;
+                                    if (image.EndsWith(","))
+                                    {
+                                        dataUrl = image.Substring(0, image.Length - 1);
+                                    }
+
+
+                                    <div class="col-md-2 col-sm-3 card text-center">
+                                        @if (image.StartsWith("image"))
+                                        {
+                                            <img class="card-img-top" style="height: 100px" src="data:@dataUrl" />
+                                        }
+                                        else
+                                        {
+                                            <i class="card-img-top fa-7x w-100 fa fa-file-pdf"></i>
+                                        }
+                                        <div class="card-body">
+
+                                            <button class=" btn-sm btn btn-primary w-100" onclick="openNewWindow('data:@dataUrl'); return false;">
+                                                <i class="fa fa-eye"></i>View
+                                            </button>
+
+                                            <a href="data:@dataUrl" class="mt-1 w-100 btn-sm btn btn-primary" target="_blank" download><i class="fa fa-download"></i>Download</a>
+
+                                        </div>
+                                    </div>
+
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+
+
+
+                <div class="col-sm-6 form-group">
+                    <label>Observation By</label>
+                    <p class="border rounded p-2">
+                        <span>@Model.Observation.ObservatioinBy.Name / @Model.Observation.ObservatioinBy.Email / @Model.Observation.ObservatioinBy.PNo</span>
+                    </p>
+                </div>
+
+
+
+
+                <div class="col-sm-6 form-group">
+                    <label>Observation Date</label>
+                    <p class="border rounded p-2">
+                        @if (Model.Observation.ObservationDate != null)
+                        {
+                            <span>@Model.Observation.ObservationDate.Value.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                        }
+                    </p>
+                </div>
+
+                <!-- /.form group -->
+            </div>
+        </div>
+    </div>
+</div>

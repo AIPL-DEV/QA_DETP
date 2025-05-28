@@ -1,0 +1,152 @@
+﻿@model AssigneeCardModel
+
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#assignee-section-@Model.Index">
+                Assignee Section
+            </a>
+        </h4>
+    </div>
+    <div id="assignee-section-@Model.Index" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label>Observation Details</label>
+                    <pre name="observation_details" class="border rounded p-2">@Model.Assignee.ObservationDetails</pre>
+                </div>
+
+
+                <div class="col-6 form-group">
+                    <label>Root Cause Analysis</label>
+                    <pre name="root_cause_analysis" class="border rounded p-2">@Model.Assignee.RootCauseAnalysis</pre>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Corrective Action</label>
+
+                    <pre name="corrective_action" class="border rounded p-2">@Model.Assignee.CorrectiveAction</pre>
+                </div>
+
+
+                <div class="col-6 form-group">
+                    <label>Preventive Action</label>
+                    <pre name="preventive_action" class="border rounded p-2">@Model.Assignee.PreventiveAction</pre>
+                </div>
+
+
+                <div class="col-6 form-group">
+                    <label>Value of Rectification (in Rs.)</label>
+                    <p name="value_of_rectification" class="border rounded p-2">
+
+                        <span>@Model.Assignee.ValueOfRectification</span>
+
+
+                    </p>
+                </div>
+
+
+                <div class="col-6 form-group">
+                    <label>Time Loss (in Number of days)</label>
+                    <p name="time_loss" class="border rounded p-2">
+                        <span>@Model.Assignee.TimeLoss</span>
+                    </p>
+                </div>
+
+
+                <div class="col-6 form-group">
+                    <label>Time Value (in Rs.)</label>
+                    <p name="time_value" class="border rounded p-2">
+                        <span>
+                            @Model.Assignee.TimeValue
+                        </span>
+                    </p>
+                </div>
+                @try
+                {
+                    List<QaAtt> siatt5 = Model.Assignee.Atts;
+
+
+                    <div class="col-12 form-group">
+                        <div class="row">
+                            <label class="col-6">Attachments</label><br>
+
+                            <div class="col-6 text-right">
+                                @if (Model.IsSuperAdmin)
+                                {
+                                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add_image_modal" type="button" onclick="$('#type_id').val('@Model.Assignee.FlowId'); $('#type').val('flow')">Add Image</button>
+                                }
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (siatt5 != null)
+                            {
+                                @for (int j = 0; j < siatt5.Count; j++)
+                                {
+                                    var images = siatt5[j].Data.Split("data:");
+                                    foreach (var image in images)
+                                    {
+                                        if (image == "")
+                                        {
+                                            continue;
+                                        }
+                                        var dataUrl = image;
+                                        if (image.EndsWith(","))
+                                        {
+                                            dataUrl = image.Substring(0, image.Length - 1);
+                                        }
+
+
+                                        <div class="col-md-2 col-sm-3 card text-center">
+                                            @if (image.StartsWith("image"))
+                                            {
+                                                <img class="card-img-top" style="height: 100px" src="data:@dataUrl" />
+                                            }
+                                            else
+                                            {
+                                                <i class="card-img-top fa-7x w-100 fa fa-file-pdf"></i>
+                                            }
+                                            <div class="card-body">
+
+                                                <button class=" btn-sm btn btn-primary w-100" onclick="openNewWindow('data:@dataUrl'); return false;">
+                                                    <i class="fa fa-eye"></i>View
+                                                </button>
+
+                                                <a href="data:@dataUrl" class="mt-1 w-100 btn-sm btn btn-primary" target="_blank" download><i class="fa fa-download"></i>Download</a>
+
+                                            </div>
+                                        </div>
+
+                                    }
+                                }
+                            }
+                        </div>
+
+
+                    </div>
+                }
+                catch { }
+
+                <div class="col-6 form-group">
+                    <label>Decision By</label>
+                    <p name="decision_by" class="border rounded p-2">
+
+                        <span>
+                            @Model.Assignee.DecisionBy?.Name
+                        </span>
+
+                    </p>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Decision Date</label>
+                    <p name="decision_date" class="border rounded p-2">
+                        <span>@Model.Assignee.DecisionDate?.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+
+
+                <!-- /.form group -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+﻿@model SiteInchargeCardModel
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h4 class="card-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#site-incharge-@Model.Index">
+                Site Incharge
+            </a>
+        </h4>
+    </div>
+    <div id="site-incharge-@Model.Index" class="panel-collapse collapse">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label>Site Incharge Input</label>
+                    <pre name="remarks" class="border rounded p-2">@Model.SiteIncharge.Remarks</pre>
+                </div>
+
+                <div class="col-6 form-group">
+                    <label>Value of Rectification (Rs.)</label>
+                    <p name="valrec2" class="border rounded p-2">
+                        <span>@Model.SiteIncharge.ValueRec</span>
+                    </p>
+                </div>
+
+                <div class="col-6 form-group">
+                    <label>Time Loss (Days)</label>
+                    <p name="timeloss2" class="border rounded p-2">
+                        <span>@Model.SiteIncharge.TimeLoss</span>
+                    </p>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Time Value (Rs.)</label>
+                    <p name="timeval2" class="border rounded p-2">
+                        <span>@Model.SiteIncharge.TimeVal</span>
+                    </p>
+                </div>
+                @{
+                    List<QaAtt> attach = Model.SiteIncharge.Atts;
+                }
+
+                <div class="col-12 form-group">
+                    <div class="row">
+                        <label class="col-6">Attachments</label><br>
+
+                        <div class="col-6 text-right">
+                            @if (Model.IsSuperAdmin)
+                            {
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add_image_modal" type="button" onclick="$('#type_id').val('@Model.SiteIncharge.FlowId'); $('#type').val('flow')">Add Image</button>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        @if (attach != null)
+                        {
+                            @for (int j = 0; j < attach.Count; j++)
+                            {
+                                var images = attach[j].Data.Split("data:");
+                                foreach (var image in images)
+                                {
+                                    if (image == "")
+                                    {
+                                        continue;
+                                    }
+                                    var dataUrl = image;
+                                    if (image.EndsWith(","))
+                                    {
+                                        dataUrl = image.Substring(0, image.Length - 1);
+                                    }
+
+
+                                    <div class="col-md-2 col-sm-3 card text-center">
+                                        @if (image.StartsWith("image"))
+                                        {
+                                            <img class="card-img-top" style="height: 100px" src="data:@dataUrl" />
+                                        }
+                                        else
+                                        {
+                                            <i class="card-img-top fa-7x w-100 fa fa-file-pdf"></i>
+                                        }
+                                        <div class="card-body">
+
+                                            <button class=" btn-sm btn btn-primary w-100" onclick="openNewWindow('data:@dataUrl'); return false;">
+                                                <i class="fa fa-eye"></i>View
+                                            </button>
+
+                                            <a href="data:@dataUrl" class="mt-1 w-100 btn-sm btn btn-primary" target="_blank" download><i class="fa fa-download"></i>Download</a>
+
+                                        </div>
+                                    </div>
+
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Decision By</label>
+                    <p name="decision_by" class="border rounded p-2">
+                        <span>@Model.SiteIncharge.DecisionBy?.Name</span>
+                    </p>
+                </div>
+                <div class="col-6 form-group">
+                    <label>Decision Date</label>
+                    <p name="decision_date" class="border rounded p-2">
+                        <span>@Model.SiteIncharge.DecisionDate?.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)</span>
+                    </p>
+                </div>
+                <!-- /.form group -->
+            </div>
+        </div>
+    </div>
+</div>

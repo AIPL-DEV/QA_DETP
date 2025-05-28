@@ -1,0 +1,261 @@
+﻿@model BusinessHeadCreateRequest
+@using DETP.Constant
+@using DETP;
+
+@{
+    var current_dt = ViewData["current_dt"] as CurrentFlow;
+    List<User> assignee_table = ViewBag.AssigneeNames;
+    var userDt = DateTime.Now.ToString("M/dd/yyyy HH:mm:ss");
+    var observation = ViewData["observation"] as QAObservation;
+}
+
+@if (!observation.IsCritical && current_dt.FromId != RoleConst.ASSIGNEE_SECTION)
+{
+    <div class="col-12 form-group">
+        <input type="hidden" value="1" asp-for="FormType" />
+        <label>Assigned To</label>
+        <select asp-for="AssignedTo" class="form-control select2">
+            @{
+                for (int i = 0; i < assignee_table.Count; i++)
+                {
+                    <option value="@assignee_table[i].UserId">
+                        @(assignee_table[i].Name + " / " + assignee_table[i].Email + " / " + assignee_table[i].PNo)
+                    </option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label>Target Date</label>
+        <div class="input-group date" id="target_date_picker" data-target-input="nearest">
+            <input type="text" class="form-control datetimepicker-input" asp-for="TargetDate" data-target="#target_date_picker" required>
+            <div class="input-group-append" data-target="#target_date_picker" data-toggle="datetimepicker">
+                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Remarks</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks" required> </textarea>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Attachments</label>
+        <input type="file" onchange="showImage(this)" class="form-control" name="fileInput" id="fileInput" multiple>
+    </div>
+
+    <div class="col-12">
+        <div class="row" id="images">
+        </div>
+    </div>
+
+
+    <script>
+        const rules = {
+            AssignedTo: {
+                required: true
+            },
+            TargetDate: {
+                required: true
+            },
+            Remarks: {
+                required: true
+            },
+            DecisionDate: {
+                required: true
+            }
+        }
+    </script>
+}
+
+else if (current_dt.FromId == RoleConst.HEAD_DETP || current_dt.FromId == RoleConst.HOD_QA_SHA && (observation.IsCritical))
+{
+    <input type="hidden" value="2" asp-for="FormType" />
+
+    <input type="hidden" value="2" asp-for="FormType" />
+    <div class="col-12 form-group">
+        <label>Assigned To</label>
+        <select asp-for="AssignedTo" class="form-control select2">
+            @{
+                for (int i = 0; i < assignee_table.Count; i++)
+                {
+                    <option value="@assignee_table[i].UserId">
+                        @(assignee_table[i].Name + " / " + assignee_table[i].Email + " / " + assignee_table[i].PNo)
+                    </option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label>Target Date</label>
+        <div class="input-group date" id="target_date_picker" data-target-input="nearest">
+            <input type="text" class="form-control datetimepicker-input" asp-for="TargetDate" data-target="#target_date_picker" required>
+            <div class="input-group-append" data-target="#target_date_picker" data-toggle="datetimepicker">
+                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 form-group">
+        <label>Attachments</label>
+        <input type="file" onchange="showImage(this)" class="form-control" name="fileInput" id="fileInput" multiple>
+    </div>
+    <div class="col-12">
+        <div class="row" id="images">
+        </div>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Remarks</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks" required> </textarea>
+    </div>
+
+    <script>
+        const rules = {
+            AssignedTo: {
+                required: true
+            },
+            RargetDate: {
+                required: true
+            },
+            Remarks: {
+                required: true
+            },
+        }
+
+    </script>
+
+}
+
+else if (current_dt.FromId == RoleConst.ASSIGNEE_SECTION)
+{
+    <input type="hidden" value="3" asp-for="FormType" />
+    <div class="col-12 form-group">
+        <label>Decision by Business Head</label>
+        <select asp-for="Decision" class="form-control">
+            <option value="Forward to Closer">Forward to Closer</option>
+            <option value="Return to assignee">Return to assignee</option>
+        </select>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Remarks</label>
+        <textarea type="text" class="form-control" asp-for="Remarks" placeholder="Remarks" required></textarea>
+    </div>
+    <div class="col-12 form-group">
+        <label for="remarks">Attachments</label>
+        <input type="file" onchange="showImage(this)" class="form-control" name="fileInput" id="fileInput" multiple>
+    </div>
+    <div class="col-12">
+        <div class="row" id="images">
+        </div>
+    </div>
+    <script>
+        const rules = {
+            Decision: {
+                required: true
+            },
+            Remarks: {
+                required: true
+            },
+            DecisionDate: {
+                required: true
+            }
+        }
+    </script>
+}
+
+<div class="col-12 form-group">
+    <label>Decision By</label>
+    <select name="decision_by" id="decision_by" class="form-control">
+        <option value="@current_dt.UserId">@current_dt.Name</option>
+    </select>
+</div>
+<div class="col-12 form-group">
+    <label>Decision Date</label>
+
+    <input type="text" class="form-control" name="decision_date" id="decision_date" value="@userDt" disabled />
+
+</div>
+<script>
+    var img_array = [];
+    function getBase64(file) {
+        img_array = [];
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            img_array.push(reader.result);
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    $(function () {
+        img_array = [];
+        var files = document.getElementById('fileInput').files;
+        for (var i = 0; i < files.length; i++) {
+            if (files.length > 0) {
+
+                var ext = files[i].name.split(".").pop();
+                const extensions = ["png", "jpg", "jpeg", "gif", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx"];
+                if (extensions.includes(ext)) {
+                    getBase64(files[i]);
+                }
+            }
+        }
+
+    });
+    $('#myform').validate({
+        rules: rules,
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            Submit(form);
+        }
+    });
+    function Submit(form) {
+        if ($('#myform').valid()) {
+            $('#modal-loader').modal('show')
+            $('#submit_request').prop('disabled', true)
+
+
+            var url = "@Url.Action("SaveBusinessHead", "QAFlow")"
+
+            imgs = [];
+            $('.image-upload').each(function () {
+                imgs.push($(this).data('src'));
+            });
+
+            let myData = new FormData(form);
+            myData.append("Att", imgs)
+            myData.append("UserId", '@current_dt.UserId')
+            myData.append("To", '@current_dt.SubmitTo')
+            myData.append("From", '@current_dt.FromId')
+            myData.append("ObservationId", '@current_dt.ObservationId')
+            myData.append("FlowId", '@current_dt.FlowId')
+
+            request(url, myData)
+                .then(response => {
+                    $('#modal-loader').modal('hide')
+                })
+                .catch((error) => {
+                    $('#modal-loader').modal('hide')
+                    if (error.status == 400) {
+                        let errors = error.responseJSON.reduce((acc, x) => {
+                            acc[x.propertyName] = x.errorMessage;
+                            return acc;
+                        }, {});
+                        console.log(errors)
+                        $('#myform').validate().showErrors(errors);
+                    }
+                });
+
+        }
+    }
+</script>

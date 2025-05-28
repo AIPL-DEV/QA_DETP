@@ -1,0 +1,117 @@
+﻿@using DETP.model.QaViolation
+@using Microsoft.AspNetCore.Http;
+@using System.Data;
+@using static DETP.Controllers.QaViolation.QAViolationsController
+@model QaViolationDashboardModel;
+
+<section class="content">
+
+	<div class="container-fluid">
+		<div class="row">
+			@if (Context.Session.GetString("app_name").Equals("QA") || Context.Session.GetString("role_name").Equals("Super Admin"))
+			{
+				<div class="col-12 row">
+					<div class="col-lg-3 col-xs-6">
+						<a href="~/Violations/Pending">
+							<div class="small-box" style="background-color: #5b9bd5; color: white">
+								<div class="inner">
+									<h3 id="nos_qa">@Model.TotalViolation</h3>
+
+									<p>Total Consequences Raised</p>
+								</div>
+								<div class="icon">
+									<i class="ion ion-pie-graph"></i>
+								</div>
+							</div>
+						</a>
+					</div>
+					<div class="col-lg-3 col-xs-6">
+						<a href="~/Violations/Pending?status=OPEN">
+							<div class="small-box" style="background-color: #ed7d31; color: white">
+								<div class="inner">
+									<h3 id="nos_pqa">@Model.Open</h3>
+
+									<p>Open Cases</p>
+								</div>
+								<div class="icon">
+									<i class="fa fa-exclamation-circle"></i>
+								</div>
+							</div>
+						</a>
+					</div>
+					
+					<div class="col-lg-3 col-xs-6">
+						<a href="~/Violations/Pending?status=CLOSE">
+							<div class="small-box" style="background-color: #70ad47; color: white;">
+								<div class="inner">
+									<h3 id="nos_pqa">@Model.Close</h3>
+
+									<p>Closed Cases</p>
+								</div>
+								<div class="icon">
+									<i class="fa fa-exclamation-circle"></i>
+								</div>
+							</div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-xs-6">
+						<a href="~/Violations/Pending?status=@QaViolationStatus.WITH_GM_TECHNICAL_SERVICES">
+							<div class="small-box" style="background-color: #ffd684; color: #333;">
+								<div class="inner">
+									<h3 id="nos_pqa">@Model.GmTechnicalServices</h3>
+
+									<p>With GM Technical Services</p>
+								</div>
+								<div class="icon">
+									<i class="fa fa-exclamation-circle"></i>
+								</div>
+							</div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-xs-6">
+						<a href="~/Violations/Pending?status=@QaViolationStatus.WITH_CFO">
+							<div class="small-box" style="background-color: #ed7d31; color: white;">
+								<div class="inner">
+									<h3 id="nos_pqa">@Model.CFO</h3>
+
+									<p>With CFO</p>
+								</div>
+								<div class="icon">
+									<i class="fa fa-exclamation-circle"></i>
+								</div>
+							</div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-xs-6">
+						<a href="~/Violations/Pending?status=@QaViolationStatus.WITH_HEAD_PROCUREMENT">
+							<div class="small-box" style="background-color: #ffc000; color: white;">
+								<div class="inner">
+									<h3 id="nos_pqa">@Model.HeadProcurement</h3>
+									
+									<p>With Head Procurement</p>
+								</div>
+								<div class="icon">
+									<i class="fa fa-exclamation-circle"></i>
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+
+
+			}
+		</div>
+
+	</div>
+</section>
+
+
+
+<script>
+
+
+
+</script>
